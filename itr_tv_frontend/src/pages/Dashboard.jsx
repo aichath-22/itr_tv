@@ -1,8 +1,28 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2, Users2 } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
+
+function AdminLinks() {
+  const links = [{ to: "/tableau-de-bord/utilisateurs", label: "Utilisateurs", icon: Users2 }];
+  return (
+    <section className="mb-10">
+      <h2 className="font-display text-lg text-itr-ink mb-4">Administration</h2>
+      <div className="flex flex-wrap gap-3">
+        {links.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className="flex items-center gap-2 bg-white hover:bg-itr-paper rounded-xl px-5 py-4 text-sm font-semibold text-itr-ink transition-colors"
+          >
+            <Icon size={18} className="text-itr-blue" /> {label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function StatCard({ label, value, icon: Icon }) {
   return (
@@ -188,6 +208,8 @@ export default function Dashboard() {
           </div>
         </section>
       )}
+
+      {hasRoleAtLeast("admin") && <AdminLinks />}
 
       {hasRoleAtLeast("admin") && <CategoryManager />}
 

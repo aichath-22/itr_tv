@@ -1,8 +1,9 @@
-from rest_framework import generics, permissions
+from rest_framework import filters, generics, permissions
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, RegisterSerializer
+from apps.core.permissions import IsAdminOrSuperAdmin
+from .serializers import UserSerializer, RegisterSerializer, AdminUserSerializer
 
 User = get_user_model()
 
@@ -28,3 +29,25 @@ class ThrottledTokenObtainPairView(TokenObtainPairView):
 
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth"
+
+
+class UserListView(generics.ListAPIView):
+    """Liste des utilisateurs — réservée à l'Admin+ (cahier des charges §2)."""
+
+    queryset = User.objects.all().order_by("-date_joined")
+    serializer_class = AdminUserSerializer
+    permission_classes = [IsAdminOrSuperAdmin]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username", "email", "first_name", "last_name"]
+
+
+class UserDetailView(generics.RetrieveUpdateAPIView):
+    """Consultation/modification (rôle, activation) d'un utilisateur.
+
+    Pas de suppression : Article.author est en PROTECT, la désactivation
+    via is_active est le mécanisme prévu plutôt qu'un delete risqué.
+    """
+
+    queryset = User.objects.all()
+    serializer_class = AdminUserSerializer
+    permission_classes = [IsAdminOrSuperAdmin]

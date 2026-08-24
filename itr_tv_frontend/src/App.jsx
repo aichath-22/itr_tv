@@ -14,6 +14,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ArticleEditor from "./pages/ArticleEditor";
+import AdminUsers from "./pages/admin/Users";
 
 export default function App() {
   return (
@@ -51,6 +52,14 @@ export default function App() {
               element={
                 <ProtectedRoute minRole="journaliste">
                   <ArticleEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/utilisateurs"
+              element={
+                <ProtectedRoute minRole="admin">
+                  <AdminUsers />
                 </ProtectedRoute>
               }
             />

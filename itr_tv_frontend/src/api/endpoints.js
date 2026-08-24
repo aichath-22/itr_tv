@@ -9,6 +9,10 @@ export const register = (payload) =>
 
 export const getMe = () => apiClient.get("/auth/me/");
 
+export const getUsers = (search = "") =>
+  apiClient.get("/auth/users/", { params: search ? { search } : {} });
+export const updateUser = (id, payload) => apiClient.patch(`/auth/users/${id}/`, payload);
+
 // --- Articles ---
 export const getArticles = (params = {}) =>
   apiClient.get("/articles/", { params });
