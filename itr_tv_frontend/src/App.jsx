@@ -15,6 +15,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import ArticleEditor from "./pages/ArticleEditor";
 import AdminUsers from "./pages/admin/Users";
+import AdminAds from "./pages/admin/Ads";
 
 export default function App() {
   return (
@@ -60,6 +61,14 @@ export default function App() {
               element={
                 <ProtectedRoute minRole="admin">
                   <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/publicite"
+              element={
+                <ProtectedRoute minRole="admin">
+                  <AdminAds />
                 </ProtectedRoute>
               }
             />

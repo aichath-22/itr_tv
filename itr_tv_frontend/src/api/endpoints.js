@@ -55,6 +55,13 @@ export const getPrograms = () => apiClient.get("/webtv/programs/");
 // --- Ads ---
 export const getBanners = (placement) =>
   apiClient.get("/ads/banners/", { params: { placement } });
+export const createBanner = (payload) => apiClient.post("/ads/banners/", payload);
+export const updateBanner = (id, payload) => apiClient.patch(`/ads/banners/${id}/`, payload);
+export const deleteBanner = (id) => apiClient.delete(`/ads/banners/${id}/`);
+
+export const getSponsors = () => apiClient.get("/ads/sponsors/");
+export const createSponsor = (payload) => apiClient.post("/ads/sponsors/", payload);
+export const deleteSponsor = (id) => apiClient.delete(`/ads/sponsors/${id}/`);
 
 // --- Newsletter ---
 export const subscribeNewsletter = (email) =>

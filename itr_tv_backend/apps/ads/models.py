@@ -27,5 +27,8 @@ class AdBanner(TimeStampedModel):
     clicks_count = models.PositiveIntegerField(default=0)
     impressions_count = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         return f"{self.sponsor} — {self.get_placement_display()}"
