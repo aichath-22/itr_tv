@@ -9,7 +9,7 @@ from apps.newsroom.models import ArticleReview
 from ..models import Category, Tag, Article, Comment
 from .serializers import (
     CategorySerializer, TagSerializer, ArticleListSerializer,
-    ArticleDetailSerializer, CommentSerializer,
+    ArticleDetailSerializer, ArticleWriteSerializer, CommentSerializer,
 )
 
 
@@ -32,7 +32,9 @@ class TagViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminOrSuperAdmin()]
+            # Simple métadonnée d'article : un journaliste peut taguer sans
+            # dépendre d'un admin (contrairement aux catégories, structurelles).
+            return [IsJournalist()]
         return super().get_permissions()
 
 
@@ -40,7 +42,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     permission_classes = [IsJournalist, IsOwnerOrReadOnly]
     lookup_field = "slug"
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["category", "status", "tags"]
+    filterset_fields = ["category", "status", "tags", "author"]
     search_fields = ["title", "content", "excerpt"]
     ordering_fields = ["published_at", "views_count", "created_at"]
 
@@ -53,6 +55,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ArticleListSerializer
+        if self.action in ["create", "update", "partial_update"]:
+            return ArticleWriteSerializer
         return ArticleDetailSerializer
 
     def perform_create(self, serializer):

@@ -13,6 +13,7 @@ import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ArticleEditor from "./pages/ArticleEditor";
 
 export default function App() {
   return (
@@ -34,6 +35,22 @@ export default function App() {
               element={
                 <ProtectedRoute minRole="journaliste">
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/articles/nouveau"
+              element={
+                <ProtectedRoute minRole="journaliste">
+                  <ArticleEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/articles/:slug/modifier"
+              element={
+                <ProtectedRoute minRole="journaliste">
+                  <ArticleEditor />
                 </ProtectedRoute>
               }
             />

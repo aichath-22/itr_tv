@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Send, BarChart3, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2 } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,12 +18,95 @@ function StatCard({ label, value, icon: Icon }) {
   );
 }
 
+function CategoryManager() {
+  const [categories, setCategories] = useState([]);
+  const [name, setName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [deletingSlug, setDeletingSlug] = useState(null);
+  const [error, setError] = useState("");
+
+  const load = () => api.getCategories().then(({ data }) => setCategories(data.results || data));
+
+  useEffect(() => { load(); }, []);
+
+  const slugify = (s) =>
+    s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setCreating(true);
+    setError("");
+    try {
+      await api.createCategory({ name: name.trim(), slug: slugify(name) });
+      setName("");
+      load();
+    } catch {
+      setError("Impossible de créer cette catégorie (nom déjà utilisé ?).");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDelete = async (slug) => {
+    if (!window.confirm("Supprimer cette catégorie ?")) return;
+    setDeletingSlug(slug);
+    try {
+      await api.deleteCategory(slug);
+      load();
+    } catch {
+      setError("Impossible de supprimer une catégorie utilisée par des articles.");
+    } finally {
+      setDeletingSlug(null);
+    }
+  };
+
+  return (
+    <section className="mb-10">
+      <h2 className="font-display text-lg text-itr-ink mb-4">Catégories</h2>
+      <div className="bg-white rounded-xl p-5">
+        <form onSubmit={handleCreate} className="flex gap-2 mb-4">
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nouvelle catégorie..."
+            className="flex-1 rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
+          />
+          <button
+            disabled={creating}
+            className="flex items-center gap-1 bg-itr-blue hover:bg-itr-blue-dark text-white text-sm font-semibold rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
+          >
+            <Plus size={15} /> Ajouter
+          </button>
+        </form>
+        {error && <p className="text-sm text-itr-red mb-3">{error}</p>}
+        <div className="flex flex-wrap gap-2">
+          {categories.map((c) => (
+            <span key={c.id} className="flex items-center gap-2 bg-itr-paper text-sm font-condensed px-3 py-1.5 rounded-full">
+              {c.name}
+              <button
+                disabled={deletingSlug === c.slug}
+                onClick={() => handleDelete(c.slug)}
+                className="text-gray-400 hover:text-itr-red disabled:opacity-50"
+                aria-label={`Supprimer ${c.name}`}
+              >
+                <Trash2 size={13} />
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Dashboard() {
   const { user, hasRoleAtLeast } = useAuth();
   const [myArticles, setMyArticles] = useState([]);
   const [pendingArticles, setPendingArticles] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [busySlug, setBusySlug] = useState(null);
 
   const loadData = () => {
     const calls = [api.getArticles({ author: user.id })];
@@ -50,13 +134,38 @@ export default function Dashboard() {
   }, [user]);
 
   const handleSubmit = async (slug) => {
-    await api.submitArticle(slug);
-    loadData();
+    setBusySlug(slug);
+    try {
+      await api.submitArticle(slug);
+      loadData();
+    } finally {
+      setBusySlug(null);
+    }
   };
 
   const handleReview = async (slug, decision) => {
-    await api.reviewArticle(slug, decision);
-    loadData();
+    let comment = "";
+    if (decision === "reject") {
+      comment = window.prompt("Raison du rejet (optionnel) :") || "";
+    }
+    setBusySlug(slug);
+    try {
+      await api.reviewArticle(slug, decision, comment);
+      loadData();
+    } finally {
+      setBusySlug(null);
+    }
+  };
+
+  const handleDelete = async (slug) => {
+    if (!window.confirm("Supprimer définitivement cet article ?")) return;
+    setBusySlug(slug);
+    try {
+      await api.deleteArticle(slug);
+      loadData();
+    } finally {
+      setBusySlug(null);
+    }
   };
 
   if (!user) return null;
@@ -80,6 +189,8 @@ export default function Dashboard() {
         </section>
       )}
 
+      {hasRoleAtLeast("admin") && <CategoryManager />}
+
       {hasRoleAtLeast("redacteur_chef") && (
         <section className="mb-10">
           <h2 className="font-display text-lg text-itr-ink mb-4">
@@ -97,14 +208,16 @@ export default function Dashboard() {
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
+                      disabled={busySlug === a.slug}
                       onClick={() => handleReview(a.slug, "approve")}
-                      className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors"
+                      className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors disabled:opacity-50"
                     >
                       <CheckCircle size={15} /> Valider
                     </button>
                     <button
+                      disabled={busySlug === a.slug}
                       onClick={() => handleReview(a.slug, "reject")}
-                      className="flex items-center gap-1 bg-itr-red hover:bg-itr-red-dark text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors"
+                      className="flex items-center gap-1 bg-itr-red hover:bg-itr-red-dark text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors disabled:opacity-50"
                     >
                       <XCircle size={15} /> Rejeter
                     </button>
@@ -117,7 +230,15 @@ export default function Dashboard() {
       )}
 
       <section>
-        <h2 className="font-display text-lg text-itr-ink mb-4">Mes articles</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-lg text-itr-ink">Mes articles</h2>
+          <Link
+            to="/tableau-de-bord/articles/nouveau"
+            className="flex items-center gap-1.5 bg-itr-blue hover:bg-itr-blue-dark text-white text-sm font-semibold rounded-full px-4 py-2 transition-colors"
+          >
+            <Plus size={15} /> Nouvel article
+          </Link>
+        </div>
         {loading ? (
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -126,8 +247,10 @@ export default function Dashboard() {
           </div>
         ) : myArticles.length === 0 ? (
           <p className="text-gray-400 text-sm bg-white rounded-xl p-6">
-            Tu n'as pas encore rédigé d'article. La création d'article depuis l'interface arrive dans une prochaine itération —
-            en attendant, utilise l'admin Django (<code>/admin/</code>) pour en créer un.
+            Tu n'as pas encore rédigé d'article.{" "}
+            <Link to="/tableau-de-bord/articles/nouveau" className="text-itr-blue font-semibold">
+              Créer mon premier article
+            </Link>
           </p>
         ) : (
           <div className="space-y-3">
@@ -137,14 +260,32 @@ export default function Dashboard() {
                   <p className="font-condensed font-semibold text-itr-ink">{a.title}</p>
                   <span className="text-xs uppercase font-bold text-itr-blue">{a.status}</span>
                 </div>
-                {a.status === "draft" && (
-                  <button
-                    onClick={() => handleSubmit(a.slug)}
-                    className="flex items-center gap-1 bg-itr-blue hover:bg-itr-blue-dark text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors shrink-0"
+                <div className="flex items-center gap-2 shrink-0">
+                  <Link
+                    to={`/tableau-de-bord/articles/${a.slug}/modifier`}
+                    className="flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-itr-blue rounded-full px-2 py-1.5"
+                    aria-label={`Modifier ${a.title}`}
                   >
-                    <Send size={14} /> Soumettre
+                    <Pencil size={14} />
+                  </Link>
+                  {a.status === "draft" && (
+                    <button
+                      disabled={busySlug === a.slug}
+                      onClick={() => handleSubmit(a.slug)}
+                      className="flex items-center gap-1 bg-itr-blue hover:bg-itr-blue-dark text-white text-sm font-semibold rounded-full px-3 py-1.5 transition-colors disabled:opacity-50"
+                    >
+                      <Send size={14} /> Soumettre
+                    </button>
+                  )}
+                  <button
+                    disabled={busySlug === a.slug}
+                    onClick={() => handleDelete(a.slug)}
+                    className="text-gray-400 hover:text-itr-red p-1.5 disabled:opacity-50"
+                    aria-label={`Supprimer ${a.title}`}
+                  >
+                    <Trash2 size={14} />
                   </button>
-                )}
+                </div>
               </div>
             ))}
           </div>

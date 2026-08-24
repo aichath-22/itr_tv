@@ -16,15 +16,28 @@ export const getArticles = (params = {}) =>
 export const getArticle = (slug) => apiClient.get(`/articles/${slug}/`);
 
 export const getCategories = () => apiClient.get("/articles/categories/");
+export const createCategory = (payload) => apiClient.post("/articles/categories/", payload);
+export const deleteCategory = (slug) => apiClient.delete(`/articles/categories/${slug}/`);
+
+export const getTags = () => apiClient.get("/articles/tags/");
+export const createTag = (name) => apiClient.post("/articles/tags/", { name });
 
 export const submitArticle = (slug) =>
   apiClient.post(`/articles/${slug}/submit/`);
 
-export const reviewArticle = (slug, decision) =>
-  apiClient.post(`/articles/${slug}/review/`, { decision });
+export const reviewArticle = (slug, decision, comment = "") =>
+  apiClient.post(`/articles/${slug}/review/`, { decision, comment });
 
 export const createArticle = (payload) =>
   apiClient.post("/articles/", payload);
+
+export const updateArticle = (slug, payload) =>
+  apiClient.patch(`/articles/${slug}/`, payload);
+
+export const deleteArticle = (slug) => apiClient.delete(`/articles/${slug}/`);
+
+export const getArticleReviews = (articleId) =>
+  apiClient.get("/newsroom/reviews/", { params: { article: articleId } });
 
 export const postComment = (articleId, content) =>
   apiClient.post("/articles/comments/", { article: articleId, content });

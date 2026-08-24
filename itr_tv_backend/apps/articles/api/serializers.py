@@ -1,3 +1,4 @@
+from django.utils.text import slugify
 from rest_framework import serializers
 from ..models import Category, Tag, Article, Comment
 
@@ -46,3 +47,33 @@ class ArticleDetailSerializer(serializers.ModelSerializer):
                   "published_at", "views_count", "related_articles", "comments",
                   "created_at", "updated_at"]
         read_only_fields = ["author", "validated_by", "views_count", "published_at", "status"]
+
+
+class ArticleWriteSerializer(serializers.ModelSerializer):
+    """Utilisé pour create/update — contrairement à ArticleDetailSerializer,
+    category et tags sont ici modifiables (identifiants), pas des objets imbriqués
+    en lecture seule. Le slug est généré côté serveur à la création."""
+
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
+    tags = serializers.PrimaryKeyRelatedField(many=True, queryset=Tag.objects.all(), required=False)
+
+    class Meta:
+        model = Article
+        fields = ["id", "title", "slug", "excerpt", "content", "cover_image", "attached_pdf",
+                  "category", "tags", "status", "published_at", "views_count",
+                  "related_articles", "created_at", "updated_at"]
+        read_only_fields = ["slug", "status", "published_at", "views_count"]
+
+    def create(self, validated_data):
+        base_slug = slugify(validated_data["title"])[:240] or "article"
+        slug = base_slug
+        suffix = 1
+        while Article.objects.filter(slug=slug).exists():
+            suffix += 1
+            slug = f"{base_slug}-{suffix}"
+        validated_data["slug"] = slug
+        return super().create(validated_data)
+
+    def to_representation(self, instance):
+        # Renvoie la représentation détaillée (catégorie/tags imbriqués) après écriture.
+        return ArticleDetailSerializer(instance, context=self.context).data
