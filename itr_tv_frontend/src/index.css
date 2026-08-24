@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette dérivée du logo ITR TV */
+  --color-itr-blue: #3a87e1;
+  --color-itr-blue-dark: #1f5fb8;
+  --color-itr-blue-deep: #0f2f5c;
+  --color-itr-red: #e03605;
+  --color-itr-red-dark: #b82a02;
+  --color-itr-ink: #14181f;
+  --color-itr-paper: #f6f7f9;
+
+  --font-display: "Archivo Black", "Inter", sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-condensed: "Roboto Condensed", "Inter", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-itr-ink);
+  background: var(--color-itr-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-itr-blue);
+  outline-offset: 2px;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
