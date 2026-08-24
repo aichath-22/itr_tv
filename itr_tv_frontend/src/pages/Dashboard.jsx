@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2, Users2, Megaphone } from "lucide-react";
+import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2, Users2, Megaphone, Tv } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
 
@@ -8,6 +8,7 @@ function AdminLinks() {
   const links = [
     { to: "/tableau-de-bord/utilisateurs", label: "Utilisateurs", icon: Users2 },
     { to: "/tableau-de-bord/publicite", label: "Publicité", icon: Megaphone },
+    { to: "/tableau-de-bord/webtv", label: "Web TV", icon: Tv },
   ];
   return (
     <section className="mb-10">

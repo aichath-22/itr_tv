@@ -48,9 +48,20 @@ export const postComment = (articleId, content) =>
 
 // --- Web TV ---
 export const getLiveStreams = () => apiClient.get("/webtv/live/");
+export const createLiveStream = (payload) => apiClient.post("/webtv/live/", payload);
+export const updateLiveStream = (id, payload) => apiClient.patch(`/webtv/live/${id}/`, payload);
+export const deleteLiveStream = (id) => apiClient.delete(`/webtv/live/${id}/`);
+
 export const getVideos = (params = {}) =>
   apiClient.get("/webtv/videos/", { params });
+export const createVideo = (payload) => apiClient.post("/webtv/videos/", payload);
+export const updateVideo = (id, payload) => apiClient.patch(`/webtv/videos/${id}/`, payload);
+export const deleteVideo = (id) => apiClient.delete(`/webtv/videos/${id}/`);
+
 export const getPrograms = () => apiClient.get("/webtv/programs/");
+export const createProgram = (payload) => apiClient.post("/webtv/programs/", payload);
+export const updateProgram = (slug, payload) => apiClient.patch(`/webtv/programs/${slug}/`, payload);
+export const deleteProgram = (slug) => apiClient.delete(`/webtv/programs/${slug}/`);
 
 // --- Ads ---
 export const getBanners = (placement) =>
