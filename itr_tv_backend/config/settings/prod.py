@@ -1,8 +1,15 @@
 import os
+from django.core.exceptions import ImproperlyConfigured
 from .base import *  # noqa
 
 DEBUG = False
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "itrtv.bj,www.itrtv.bj").split(",")
+
+if not os.getenv("DJANGO_SECRET_KEY"):
+    raise ImproperlyConfigured(
+        "DJANGO_SECRET_KEY doit être défini en production (variable d'environnement "
+        "absente ou .env non monté) — refus de démarrer avec la clé de secours de dev."
+    )
 
 DATABASES = {
     "default": {

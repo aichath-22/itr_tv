@@ -10,6 +10,11 @@ class ProgramViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = "slug"
 
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return [IsAdminOrSuperAdmin()]
+        return super().get_permissions()
+
 
 class LiveStreamViewSet(viewsets.ModelViewSet):
     queryset = LiveStream.objects.select_related("program")
