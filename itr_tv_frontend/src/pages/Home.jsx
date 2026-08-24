@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Radio, PlayCircle, ArrowRight } from "lucide-react";
 import * as api from "../api/endpoints";
 import ArticleCard from "../components/ArticleCard";
+import ArticleListRow from "../components/ArticleListRow";
 
 export default function Home() {
   const [articles, setArticles] = useState([]);
@@ -57,12 +58,18 @@ export default function Home() {
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
-                {heroArticle.category && (
-                  <span className="bg-itr-red text-xs font-condensed font-bold uppercase tracking-wide px-2.5 py-1 rounded">
-                    {heroArticle.category.name}
-                  </span>
-                )}
-                <h1 className="font-display text-2xl md:text-4xl mt-3 leading-tight max-w-2xl">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="font-condensed text-[11px] font-bold uppercase tracking-[0.15em] text-itr-red">À la une</span>
+                  {heroArticle.category && (
+                    <>
+                      <span className="text-white/30">·</span>
+                      <span className="bg-itr-red text-xs font-condensed font-bold uppercase tracking-wide px-2.5 py-1 rounded">
+                        {heroArticle.category.name}
+                      </span>
+                    </>
+                  )}
+                </div>
+                <h1 className="font-display text-2xl md:text-4xl leading-tight max-w-2xl text-balance">
                   {heroArticle.title}
                 </h1>
               </div>
@@ -74,13 +81,16 @@ export default function Home() {
           )}
 
           {/* Live block */}
-          <div className="bg-black/30 rounded-xl p-5 flex flex-col">
+          <div className="bg-black/30 rounded-xl p-5 flex flex-col border border-white/10">
             <div className="flex items-center gap-2 text-itr-red font-condensed font-bold uppercase text-sm mb-3">
               <Radio size={16} className={live?.status === "live" ? "animate-pulse" : ""} />
               {live?.status === "live" ? "En direct maintenant" : "Prochain direct"}
             </div>
-            <div className="aspect-video bg-black/40 rounded-lg mb-3 flex items-center justify-center">
-              <PlayCircle size={40} className="text-white/50" />
+            <div className="aspect-video bg-itr-blue-deep rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+              {live?.thumbnail && (
+                <img src={live.thumbnail} alt="" className="absolute inset-0 h-full w-full object-cover opacity-60" />
+              )}
+              <PlayCircle size={40} className="relative text-white/90 drop-shadow" />
             </div>
             <p className="font-display text-lg leading-snug mb-1">
               {live ? live.title : "Aucun direct programmé"}
@@ -113,20 +123,27 @@ export default function Home() {
               Toute l'actualité <ArrowRight size={15} />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {secondaryArticles.map((a) => (
-              <ArticleCard key={a.id} article={a} />
-            ))}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:items-start">
+            <div className="lg:col-span-2">
+              <ArticleCard article={secondaryArticles[0]} size="lg" />
+            </div>
+            {secondaryArticles.length > 1 && (
+              <div className="bg-white rounded-xl p-4">
+                {secondaryArticles.slice(1, 4).map((a) => (
+                  <ArticleListRow key={a.id} article={a} />
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
 
       {/* WEB TV STRIP */}
-      <section className="bg-itr-ink text-white py-10">
+      <section className="bg-itr-blue-deep text-white py-10 border-t-4 border-itr-red">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display text-xl">Web TV — Rediffusions</h2>
-            <Link to="/webtv" className="text-itr-blue text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
+            <Link to="/webtv" className="text-white/70 hover:text-white text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
               Bibliothèque vidéo <ArrowRight size={15} />
             </Link>
           </div>
@@ -153,9 +170,9 @@ export default function Home() {
       {latestArticles.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 py-10">
           <h2 className="font-display text-xl text-itr-ink mb-5">Dernières informations</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 bg-white rounded-xl p-4">
             {latestArticles.map((a) => (
-              <ArticleCard key={a.id} article={a} />
+              <ArticleListRow key={a.id} article={a} />
             ))}
           </div>
         </section>
