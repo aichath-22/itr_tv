@@ -36,11 +36,11 @@ export default function Auth() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-16">
-      <div className="bg-white rounded-2xl shadow-sm p-8 border-t-4 border-itr-red">
-        <div className="flex mb-8 rounded-lg bg-itr-paper p-1">
+      <div className="bg-white rounded-2xl shadow-sm p-8">
+        <div className="flex mb-8 rounded-full bg-itr-paper p-1">
           <button
             onClick={() => setMode("login")}
-            className={`flex-1 py-2 rounded-md text-sm font-condensed font-bold uppercase transition-colors ${
+            className={`flex-1 py-2 rounded-full text-sm font-condensed font-bold uppercase transition-colors ${
               mode === "login" ? "bg-itr-blue text-white" : "text-itr-ink"
             }`}
           >
@@ -48,7 +48,7 @@ export default function Auth() {
           </button>
           <button
             onClick={() => setMode("register")}
-            className={`flex-1 py-2 rounded-md text-sm font-condensed font-bold uppercase transition-colors ${
+            className={`flex-1 py-2 rounded-full text-sm font-condensed font-bold uppercase transition-colors ${
               mode === "register" ? "bg-itr-blue text-white" : "text-itr-ink"
             }`}
           >

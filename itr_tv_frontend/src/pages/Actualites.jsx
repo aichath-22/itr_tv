@@ -47,7 +47,7 @@ export default function Actualites() {
         <button
           onClick={() => setSearchParams({})}
           className={`px-4 py-1.5 rounded-full text-sm font-condensed font-semibold uppercase transition-colors ${
-            !activeCategory ? "bg-itr-red text-white" : "bg-white text-itr-ink border border-gray-200 hover:border-itr-red"
+            !activeCategory ? "bg-itr-blue text-white" : "bg-white text-itr-ink border border-gray-200 hover:border-itr-blue"
           }`}
         >
           Toutes
@@ -58,8 +58,8 @@ export default function Actualites() {
             onClick={() => setSearchParams({ categorie: cat.id })}
             className={`px-4 py-1.5 rounded-full text-sm font-condensed font-semibold uppercase transition-colors ${
               activeCategory === String(cat.id)
-                ? "bg-itr-red text-white"
-                : "bg-white text-itr-ink border border-gray-200 hover:border-itr-red"
+                ? "bg-itr-blue text-white"
+                : "bg-white text-itr-ink border border-gray-200 hover:border-itr-blue"
             }`}
           >
             {cat.name}

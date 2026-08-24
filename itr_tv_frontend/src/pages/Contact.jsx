@@ -12,30 +12,20 @@ export default function Contact() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-14 grid grid-cols-1 md:grid-cols-2 gap-10">
       <div>
-        <span className="font-condensed text-xs font-bold uppercase tracking-[0.15em] text-itr-red">Contactez-nous</span>
-        <h1 className="font-display text-3xl text-itr-ink mt-2 mb-6">Contact</h1>
+        <h1 className="font-display text-3xl text-itr-ink mb-6">Contact</h1>
         <p className="text-gray-500 mb-8 leading-relaxed">
           Une question, une information à nous transmettre, ou une proposition de partenariat ?
           Écrivez-nous.
         </p>
         <div className="space-y-4 text-sm">
           <div className="flex items-center gap-3">
-            <span className="h-9 w-9 rounded-lg bg-itr-blue/10 flex items-center justify-center text-itr-blue-dark shrink-0">
-              <Mail size={17} />
-            </span>
-            contact@itrtv.bj
+            <Mail size={18} className="text-itr-blue" /> contact@itrtv.bj
           </div>
           <div className="flex items-center gap-3">
-            <span className="h-9 w-9 rounded-lg bg-itr-blue/10 flex items-center justify-center text-itr-blue-dark shrink-0">
-              <Phone size={17} />
-            </span>
-            +229 00 00 00 00
+            <Phone size={18} className="text-itr-blue" /> +229 00 00 00 00
           </div>
           <div className="flex items-center gap-3">
-            <span className="h-9 w-9 rounded-lg bg-itr-blue/10 flex items-center justify-center text-itr-blue-dark shrink-0">
-              <MapPin size={17} />
-            </span>
-            Cotonou, Bénin
+            <MapPin size={18} className="text-itr-blue" /> Cotonou, Bénin
           </div>
         </div>
       </div>
