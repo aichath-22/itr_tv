@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
-import { Radio, Camera, PlaySquare, MessageCircle, Users, Music2 } from "lucide-react";
 import { useState } from "react";
 import * as api from "../api/endpoints";
 import logo from "../assets/logo-compact.jpeg";
+import { FacebookIcon, InstagramIcon, YoutubeIcon, WhatsappIcon, LinkedinIcon, TiktokIcon } from "./SocialIcons";
 
 const SOCIALS = [
-  { icon: Radio, href: "#", label: "Facebook" },
-  { icon: Camera, href: "#", label: "Instagram" },
-  { icon: PlaySquare, href: "#", label: "YouTube" },
-  { icon: MessageCircle, href: "#", label: "WhatsApp" },
-  { icon: Users, href: "#", label: "LinkedIn" },
-  { icon: Music2, href: "#", label: "TikTok" },
+  { icon: FacebookIcon, href: "#", label: "Facebook" },
+  { icon: InstagramIcon, href: "#", label: "Instagram" },
+  { icon: YoutubeIcon, href: "#", label: "YouTube" },
+  { icon: WhatsappIcon, href: "#", label: "WhatsApp" },
+  { icon: LinkedinIcon, href: "#", label: "LinkedIn" },
+  { icon: TiktokIcon, href: "#", label: "TikTok" },
 ];
 
 export default function Footer() {
@@ -30,7 +30,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-itr-blue-deep text-white mt-16">
+    <footer className="bg-itr-blue-deep text-white mt-16 border-t-4 border-itr-red">
       <div className="mx-auto max-w-7xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
           <img src={logo} alt="ITR TV" className="h-14 w-auto object-contain bg-white rounded-lg p-1 mb-4" />
@@ -86,9 +86,9 @@ export default function Footer() {
                 key={label}
                 href={href}
                 aria-label={label}
-                className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-itr-red transition-colors"
+                className="h-9 w-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-itr-red transition-colors"
               >
-                <Icon size={16} />
+                <Icon />
               </a>
             ))}
           </div>

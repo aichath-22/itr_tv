@@ -19,12 +19,26 @@ export default function Header() {
   const { user, signOut, hasRoleAtLeast } = useAuth();
 
   const linkClass = ({ isActive }) =>
-    `font-condensed font-semibold uppercase text-sm tracking-wide px-3 py-2 transition-colors ${
-      isActive ? "text-itr-red" : "text-itr-ink hover:text-itr-blue"
+    `relative font-condensed font-semibold uppercase text-sm tracking-wide px-3 py-2 transition-colors after:absolute after:left-3 after:right-3 after:-bottom-px after:h-[3px] after:rounded-full after:transition-opacity ${
+      isActive
+        ? "text-itr-red after:bg-itr-red after:opacity-100"
+        : "text-itr-ink hover:text-itr-blue after:bg-itr-blue after:opacity-0 hover:after:opacity-60"
     }`;
+
+  const todayLabel = (() => {
+    const s = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  })();
 
   return (
     <header className="bg-white sticky top-0 z-40 shadow-sm">
+      <div className="hidden sm:block border-b border-gray-100">
+        <div className="mx-auto max-w-7xl px-4 h-8 flex items-center justify-between">
+          <span className="font-condensed text-[11px] uppercase tracking-[0.15em] text-gray-400">{todayLabel}</span>
+          <span className="font-condensed text-[11px] uppercase tracking-[0.15em] text-gray-400">itrtv.bj · L'information en continu</span>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 flex items-center justify-between h-16 gap-4">
         <Link to="/" className="shrink-0 flex items-center h-full py-2">
           <img src={logo} alt="ITR TV — L'Information en Temps Réel" className="h-12 w-auto object-contain" />
@@ -41,7 +55,7 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-2">
           <button
             aria-label="Rechercher"
-            className="p-2 rounded-full hover:bg-itr-paper text-itr-ink"
+            className="p-2 rounded-lg hover:bg-itr-paper text-itr-ink transition-colors"
           >
             <Search size={20} />
           </button>
@@ -57,7 +71,7 @@ export default function Header() {
               )}
               <button
                 onClick={signOut}
-                className="flex items-center gap-2 bg-itr-ink text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-black transition-colors"
+                className="flex items-center gap-2 bg-itr-ink text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-black transition-colors"
               >
                 <User size={16} /> {user.username}
               </button>
@@ -65,7 +79,7 @@ export default function Header() {
           ) : (
             <Link
               to="/connexion"
-              className="bg-itr-blue text-white rounded-full px-5 py-2 text-sm font-semibold hover:bg-itr-blue-dark transition-colors"
+              className="bg-itr-blue text-white rounded-lg px-5 py-2 text-sm font-semibold hover:bg-itr-blue-dark transition-colors"
             >
               Connexion
             </Link>
