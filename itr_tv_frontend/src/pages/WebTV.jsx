@@ -22,22 +22,27 @@ export default function WebTV() {
     <div className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="font-display text-2xl text-itr-ink mb-6">Web TV</h1>
 
-      <section className="bg-itr-ink rounded-xl overflow-hidden mb-10">
-        <div className="aspect-video bg-black flex items-center justify-center relative">
+      <section className="bg-itr-blue-deep rounded-xl overflow-hidden mb-10 border-t-4 border-itr-red">
+        <div className="aspect-video bg-itr-blue-deep flex items-center justify-center relative overflow-hidden">
           {currentLive ? (
             <>
               {currentLive.stream_url ? (
                 <iframe
                   src={currentLive.stream_url}
                   title={currentLive.title}
-                  className="w-full h-full"
+                  className="w-full h-full relative z-10"
                   allow="autoplay; encrypted-media"
                   allowFullScreen
                 />
               ) : (
-                <PlayCircle size={56} className="text-white/50" />
+                <>
+                  {currentLive.thumbnail && (
+                    <img src={currentLive.thumbnail} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
+                  )}
+                  <PlayCircle size={56} className="relative text-white/90 drop-shadow" />
+                </>
               )}
-              <span className="absolute top-4 left-4 bg-itr-red text-white text-xs font-condensed font-bold uppercase px-3 py-1 rounded flex items-center gap-1.5">
+              <span className="absolute top-4 left-4 bg-itr-red text-white text-xs font-condensed font-bold uppercase px-3 py-1 rounded flex items-center gap-1.5 z-20">
                 <Radio size={12} className="animate-pulse" /> En direct
               </span>
             </>
@@ -56,7 +61,7 @@ export default function WebTV() {
       </section>
 
       {upcoming.length > 0 && (
-        <section className="mb-10">
+        <section className="mb-10 pt-8 border-t border-gray-200">
           <h2 className="font-display text-xl text-itr-ink mb-4">Directs à venir</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {upcoming.map((s) => (
@@ -72,7 +77,7 @@ export default function WebTV() {
         </section>
       )}
 
-      <section>
+      <section className="pt-8 border-t border-gray-200">
         <h2 className="font-display text-xl text-itr-ink mb-4">Bibliothèque vidéo</h2>
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -92,15 +97,17 @@ export default function WebTV() {
                 rel="noreferrer"
                 className="group block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="aspect-video bg-gray-200 relative overflow-hidden">
-                  {v.thumbnail && (
-                    <img src={v.thumbnail} alt="" className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
+                <div className="aspect-video bg-itr-blue-deep relative overflow-hidden">
+                  {v.thumbnail ? (
+                    <img src={v.thumbnail} alt={v.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform" />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-white/30 font-display text-xl">ITR</div>
                   )}
                   <PlayCircle className="absolute inset-0 m-auto text-white drop-shadow" size={36} />
                 </div>
                 <div className="p-3">
                   <p className="font-condensed font-semibold text-sm text-itr-ink leading-snug line-clamp-2">{v.title}</p>
-                  {v.program && <p className="text-xs text-gray-400 mt-1">{v.program.name}</p>}
+                  {v.program && <p className="text-xs text-itr-red font-condensed font-bold uppercase tracking-wide mt-1">{v.program.name}</p>}
                 </div>
               </a>
             ))}

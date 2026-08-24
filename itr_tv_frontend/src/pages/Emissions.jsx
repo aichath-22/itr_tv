@@ -27,8 +27,15 @@ export default function Emissions() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {programs.map((p) => (
             <div key={p.id} className="bg-white rounded-xl overflow-hidden shadow-sm">
-              <div className="aspect-video bg-itr-blue-deep">
-                {p.thumbnail && <img src={p.thumbnail} alt="" className="h-full w-full object-cover" />}
+              <div className="aspect-video bg-itr-blue-deep relative overflow-hidden">
+                {p.thumbnail ? (
+                  <img src={p.thumbnail} alt={p.name} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-white/30 font-display text-2xl">ITR</div>
+                )}
+                <span className="absolute top-3 left-3 bg-itr-red text-white text-[11px] font-condensed font-bold uppercase tracking-wide px-2.5 py-1 rounded">
+                  Émission
+                </span>
               </div>
               <div className="p-4">
                 <h2 className="font-display text-lg text-itr-ink">{p.name}</h2>
