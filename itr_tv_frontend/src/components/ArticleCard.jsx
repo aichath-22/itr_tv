@@ -13,7 +13,7 @@ export default function ArticleCard({ article, size = "md" }) {
         {article.cover_image ? (
           <img
             src={article.cover_image}
-            alt=""
+            alt={article.title}
             className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (

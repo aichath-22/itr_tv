@@ -54,7 +54,7 @@ export default function ArticleDetail() {
           {article.category.name}
         </span>
       )}
-      <h1 className="font-display text-3xl md:text-4xl text-itr-ink mt-4 leading-tight">{article.title}</h1>
+      <h1 className="font-display text-3xl md:text-4xl text-itr-ink mt-4 leading-tight text-balance">{article.title}</h1>
 
       <div className="flex items-center gap-4 mt-4 text-sm text-gray-500 font-condensed">
         <span>Par {article.author_name}</span>
@@ -69,8 +69,14 @@ export default function ArticleDetail() {
         </span>
       </div>
 
+      {article.excerpt && (
+        <p className="text-lg text-itr-ink/80 font-medium leading-snug mt-5 border-l-4 border-itr-red pl-4">
+          {article.excerpt}
+        </p>
+      )}
+
       {article.cover_image && (
-        <img src={article.cover_image} alt="" className="w-full aspect-16/9 object-cover rounded-xl mt-6" />
+        <img src={article.cover_image} alt={article.title} className="w-full aspect-16/9 object-cover rounded-xl mt-6" />
       )}
 
       <div className="prose prose-lg max-w-none mt-8 whitespace-pre-line text-itr-ink leading-relaxed">

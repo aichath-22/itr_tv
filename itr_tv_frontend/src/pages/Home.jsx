@@ -51,7 +51,7 @@ export default function Home() {
                 {heroArticle.cover_image && (
                   <img
                     src={heroArticle.cover_image}
-                    alt=""
+                    alt={heroArticle.title}
                     className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 )}
