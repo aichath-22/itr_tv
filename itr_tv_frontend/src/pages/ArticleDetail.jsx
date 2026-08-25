@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Eye, Calendar, Send } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Eye, Calendar, Send, Heart, Share2 } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
+
+const SHARE_LINKS = (url, title) => [
+  { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
+  { label: "WhatsApp", href: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}` },
+  { label: "X", href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}` },
+  { label: "LinkedIn", href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
+];
 
 export default function ArticleDetail() {
   const { slug } = useParams();
@@ -10,7 +17,9 @@ export default function ArticleDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [comment, setComment] = useState("");
+  const [liking, setLiking] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -34,6 +43,20 @@ export default function ArticleDetail() {
     }
   };
 
+  const handleLike = async () => {
+    if (!user) {
+      navigate("/connexion");
+      return;
+    }
+    setLiking(true);
+    try {
+      const { data } = await api.toggleLike(slug);
+      setArticle((a) => ({ ...a, is_liked: data.liked, likes_count: data.likes_count }));
+    } finally {
+      setLiking(false);
+    }
+  };
+
   if (loading) {
     return <div className="mx-auto max-w-3xl px-4 py-16 animate-pulse text-gray-400">Chargement de l'article...</div>;
   }
@@ -47,6 +70,8 @@ export default function ArticleDetail() {
     );
   }
 
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-10">
       {article.category && (
@@ -56,7 +81,7 @@ export default function ArticleDetail() {
       )}
       <h1 className="font-display text-3xl md:text-4xl text-itr-ink mt-4 leading-tight">{article.title}</h1>
 
-      <div className="flex items-center gap-4 mt-4 text-sm text-gray-500 font-condensed">
+      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500 font-condensed">
         <span>Par {article.author_name}</span>
         {article.published_at && (
           <span className="flex items-center gap-1">
@@ -67,6 +92,33 @@ export default function ArticleDetail() {
         <span className="flex items-center gap-1">
           <Eye size={14} /> {article.views_count} vues
         </span>
+        <button
+          onClick={handleLike}
+          disabled={liking}
+          aria-pressed={article.is_liked}
+          className={`flex items-center gap-1 transition-colors disabled:opacity-50 ${
+            article.is_liked ? "text-itr-red" : "text-gray-500 hover:text-itr-red"
+          }`}
+        >
+          <Heart size={14} fill={article.is_liked ? "currentColor" : "none"} /> {article.likes_count ?? 0}
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2 mt-4">
+        <span className="text-xs font-condensed font-bold uppercase text-gray-400 flex items-center gap-1">
+          <Share2 size={13} /> Partager :
+        </span>
+        {SHARE_LINKS(shareUrl, article.title).map((s) => (
+          <a
+            key={s.label}
+            href={s.href}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs font-condensed font-semibold text-itr-blue hover:text-itr-blue-dark px-2 py-1 rounded-full border border-gray-200 hover:border-itr-blue transition-colors"
+          >
+            {s.label}
+          </a>
+        ))}
       </div>
 
       {article.cover_image && (

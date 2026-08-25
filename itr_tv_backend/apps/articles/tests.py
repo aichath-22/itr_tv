@@ -73,3 +73,38 @@ class ArticleCreationTests(APITestCase):
         article.refresh_from_db()
         self.assertEqual(article.status, Article.Status.PENDING)
         self.assertEqual(article.reviews.count(), 1)
+
+
+class ArticleLikeTests(APITestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Sport", slug="sport")
+        self.journalist = User.objects.create_user(
+            username="journaliste_like", password="pass12345", role=User.Role.JOURNALISTE,
+        )
+        self.subscriber = User.objects.create_user(
+            username="abonne_like", password="pass12345", role=User.Role.ABONNE,
+        )
+        self.article = Article.objects.create(
+            title="Article public", slug="article-public", content="Contenu.",
+            category=self.category, author=self.journalist, status=Article.Status.PUBLISHED,
+        )
+
+    def test_anonymous_cannot_like(self):
+        response = self.client.post(f"/api/v1/articles/{self.article.slug}/like/")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_subscriber_can_toggle_like(self):
+        self.client.force_authenticate(self.subscriber)
+        first = self.client.post(f"/api/v1/articles/{self.article.slug}/like/")
+        self.assertEqual(first.status_code, status.HTTP_200_OK)
+        self.assertEqual(first.data, {"liked": True, "likes_count": 1})
+
+        second = self.client.post(f"/api/v1/articles/{self.article.slug}/like/")
+        self.assertEqual(second.data, {"liked": False, "likes_count": 0})
+
+    def test_likes_count_and_is_liked_on_article_detail(self):
+        self.article.liked_by.add(self.subscriber)
+        self.client.force_authenticate(self.subscriber)
+        response = self.client.get(f"/api/v1/articles/{self.article.slug}/")
+        self.assertEqual(response.data["likes_count"], 1)
+        self.assertTrue(response.data["is_liked"])

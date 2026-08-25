@@ -12,6 +12,7 @@ export const getMe = () => apiClient.get("/auth/me/");
 export const getUsers = (search = "") =>
   apiClient.get("/auth/users/", { params: search ? { search } : {} });
 export const updateUser = (id, payload) => apiClient.patch(`/auth/users/${id}/`, payload);
+export const createJournalist = (payload) => apiClient.post("/auth/journalists/", payload);
 
 // --- Articles ---
 export const getArticles = (params = {}) =>
@@ -42,6 +43,8 @@ export const deleteArticle = (slug) => apiClient.delete(`/articles/${slug}/`);
 
 export const getArticleReviews = (articleId) =>
   apiClient.get("/newsroom/reviews/", { params: { article: articleId } });
+
+export const toggleLike = (slug) => apiClient.post(`/articles/${slug}/like/`);
 
 export const postComment = (articleId, content) =>
   apiClient.post("/articles/comments/", { article: articleId, content });

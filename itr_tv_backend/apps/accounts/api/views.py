@@ -2,8 +2,8 @@ from rest_framework import filters, generics, permissions
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
-from apps.core.permissions import IsAdminOrSuperAdmin
-from .serializers import UserSerializer, RegisterSerializer, AdminUserSerializer
+from apps.core.permissions import IsAdmin
+from .serializers import UserSerializer, RegisterSerializer, AdminUserSerializer, CreateJournalistSerializer
 
 User = get_user_model()
 
@@ -31,12 +31,20 @@ class ThrottledTokenObtainPairView(TokenObtainPairView):
     throttle_scope = "auth"
 
 
+class CreateJournalistView(generics.CreateAPIView):
+    """L'administrateur crée directement un compte journaliste."""
+
+    queryset = User.objects.all()
+    serializer_class = CreateJournalistSerializer
+    permission_classes = [IsAdmin]
+
+
 class UserListView(generics.ListAPIView):
-    """Liste des utilisateurs — réservée à l'Admin+ (cahier des charges §2)."""
+    """Liste des utilisateurs — réservée à l'administrateur."""
 
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = AdminUserSerializer
-    permission_classes = [IsAdminOrSuperAdmin]
+    permission_classes = [IsAdmin]
     filter_backends = [filters.SearchFilter]
     search_fields = ["username", "email", "first_name", "last_name"]
 
@@ -50,4 +58,4 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
-    permission_classes = [IsAdminOrSuperAdmin]
+    permission_classes = [IsAdmin]

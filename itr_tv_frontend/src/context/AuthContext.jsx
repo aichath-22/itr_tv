@@ -52,9 +52,7 @@ export function AuthProvider({ children }) {
   const roleRank = {
     abonne: 1,
     journaliste: 2,
-    redacteur_chef: 3,
-    admin: 4,
-    super_admin: 5,
+    admin: 3,
   };
 
   const hasRoleAtLeast = (role) =>

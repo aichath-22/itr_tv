@@ -134,14 +134,14 @@ export default function Dashboard() {
 
   const loadData = () => {
     const calls = [api.getArticles({ author: user.id })];
-    if (hasRoleAtLeast("redacteur_chef")) calls.push(api.getArticles({ status: "pending" }));
+    if (hasRoleAtLeast("admin")) calls.push(api.getArticles({ status: "pending" }));
     if (hasRoleAtLeast("admin")) calls.push(api.getDashboard());
 
     Promise.allSettled(calls).then((results) => {
       if (results[0]?.status === "fulfilled") {
         setMyArticles(results[0].value.data.results || results[0].value.data);
       }
-      if (hasRoleAtLeast("redacteur_chef") && results[1]?.status === "fulfilled") {
+      if (hasRoleAtLeast("admin") && results[1]?.status === "fulfilled") {
         setPendingArticles(results[1].value.data.results || results[1].value.data);
       }
       if (hasRoleAtLeast("admin")) {
@@ -217,7 +217,7 @@ export default function Dashboard() {
 
       {hasRoleAtLeast("admin") && <CategoryManager />}
 
-      {hasRoleAtLeast("redacteur_chef") && (
+      {hasRoleAtLeast("admin") && (
         <section className="mb-10">
           <h2 className="font-display text-lg text-itr-ink mb-4">
             Articles en attente de validation ({pendingArticles.length})

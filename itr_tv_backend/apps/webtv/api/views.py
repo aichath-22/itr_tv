@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions
-from apps.core.permissions import IsAdminOrSuperAdmin
+from apps.core.permissions import IsAdmin
 from ..models import Program, LiveStream, Video
 from .serializers import ProgramSerializer, LiveStreamSerializer, VideoSerializer
 
@@ -12,7 +12,7 @@ class ProgramViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminOrSuperAdmin()]
+            return [IsAdmin()]
         return super().get_permissions()
 
 
@@ -23,7 +23,7 @@ class LiveStreamViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminOrSuperAdmin()]
+            return [IsAdmin()]
         return super().get_permissions()
 
 
@@ -34,5 +34,5 @@ class VideoViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminOrSuperAdmin()]
+            return [IsAdmin()]
         return super().get_permissions()

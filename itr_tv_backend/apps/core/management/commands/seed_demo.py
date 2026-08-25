@@ -114,8 +114,8 @@ class Command(BaseCommand):
     def _create_users(self):
         specs = [
             ("demo_journaliste", User.Role.JOURNALISTE, "Awa", "Sossou"),
-            ("demo_redacteur_chef", User.Role.REDACTEUR_CHEF, "Fabrice", "Hounkpê"),
-            ("demo_admin", User.Role.ADMIN, "Chimène", "Adjahouinou"),
+            # L'administrateur fait aussi office de rédacteur en chef (valide les articles).
+            ("demo_admin", User.Role.ADMIN, "Fabrice", "Hounkpê"),
         ]
         users = {}
         for username, role, first_name, last_name in specs:
@@ -143,7 +143,7 @@ class Command(BaseCommand):
 
     def _create_articles(self, users, categories, tags):
         author = users[User.Role.JOURNALISTE]
-        validator = users[User.Role.REDACTEUR_CHEF]
+        validator = users[User.Role.ADMIN]
         now = timezone.now()
         articles = []
         for i, (title, cat_name, cover_idx) in enumerate(ARTICLES):
@@ -166,7 +166,7 @@ class Command(BaseCommand):
 
     def _create_comments(self, articles, users):
         Comment.objects.create(
-            article=articles[0], author=users[User.Role.REDACTEUR_CHEF],
+            article=articles[0], author=users[User.Role.ADMIN],
             content="Bon article, merci pour ce suivi.",
         )
 

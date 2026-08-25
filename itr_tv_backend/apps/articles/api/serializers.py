@@ -24,28 +24,43 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ["author"]
 
 
-class ArticleListSerializer(serializers.ModelSerializer):
+class LikeFieldsMixin:
+    def get_likes_count(self, obj):
+        return obj.liked_by.count()
+
+    def get_is_liked(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        return bool(user and user.is_authenticated and obj.liked_by.filter(pk=user.pk).exists())
+
+
+class ArticleListSerializer(LikeFieldsMixin, serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     author_name = serializers.CharField(source="author.username", read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ["id", "title", "slug", "excerpt", "cover_image", "category",
-                  "author_name", "status", "published_at", "views_count"]
+                  "author_name", "status", "published_at", "views_count",
+                  "likes_count", "is_liked"]
 
 
-class ArticleDetailSerializer(serializers.ModelSerializer):
+class ArticleDetailSerializer(LikeFieldsMixin, serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     author_name = serializers.CharField(source="author.username", read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = ["id", "title", "slug", "excerpt", "content", "cover_image", "attached_pdf",
                   "category", "tags", "author", "author_name", "status", "validated_by",
-                  "published_at", "views_count", "related_articles", "comments",
-                  "created_at", "updated_at"]
+                  "published_at", "views_count", "likes_count", "is_liked",
+                  "related_articles", "comments", "created_at", "updated_at"]
         read_only_fields = ["author", "validated_by", "views_count", "published_at", "status"]
 
 

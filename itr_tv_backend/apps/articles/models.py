@@ -49,6 +49,9 @@ class Article(TimeStampedModel):
     published_at = models.DateTimeField(null=True, blank=True)
     views_count = models.PositiveIntegerField(default=0)
     related_articles = models.ManyToManyField("self", blank=True, symmetrical=False)
+    liked_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="liked_articles", blank=True,
+    )
 
     class Meta:
         ordering = ["-published_at", "-created_at"]

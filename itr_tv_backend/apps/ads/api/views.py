@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from apps.core.permissions import IsAdminOrSuperAdmin
+from apps.core.permissions import IsAdmin
 from ..models import Sponsor, AdBanner
 from .serializers import SponsorSerializer, AdBannerSerializer
 
@@ -11,7 +11,7 @@ from .serializers import SponsorSerializer, AdBannerSerializer
 class SponsorViewSet(viewsets.ModelViewSet):
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
-    permission_classes = [IsAdminOrSuperAdmin]
+    permission_classes = [IsAdmin]
 
 
 class AdBannerViewSet(viewsets.ModelViewSet):
@@ -20,7 +20,7 @@ class AdBannerViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ["list", "track_click", "track_impression"]:
             return [permissions.AllowAny()]
-        return [IsAdminOrSuperAdmin()]
+        return [IsAdmin()]
 
     def get_queryset(self):
         qs = AdBanner.objects.select_related("sponsor")

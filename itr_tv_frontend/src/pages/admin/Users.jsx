@@ -1,22 +1,91 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 import * as api from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
 
 const ROLE_OPTIONS = [
   { value: "abonne", label: "Abonné" },
   { value: "journaliste", label: "Journaliste" },
-  { value: "redacteur_chef", label: "Rédacteur en chef" },
   { value: "admin", label: "Administrateur" },
-  { value: "super_admin", label: "Super administrateur" },
 ];
 
-const SENSITIVE_ROLES = ["admin", "super_admin"];
+const inputClass = "rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none";
+
+const EMPTY_JOURNALIST = { username: "", email: "", password: "", first_name: "", last_name: "" };
+
+function CreateJournalistForm({ onCreated }) {
+  const [form, setForm] = useState(EMPTY_JOURNALIST);
+  const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setFieldErrors({});
+    setFormError("");
+    setSuccess("");
+    try {
+      const { data } = await api.createJournalist(form);
+      setSuccess(`Compte journaliste « ${data.username} » créé.`);
+      setForm(EMPTY_JOURNALIST);
+      onCreated();
+    } catch (err) {
+      const data = err.response?.data;
+      if (data && typeof data === "object") setFieldErrors(data);
+      else setFormError("Impossible de créer ce compte.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="mb-10">
+      <h2 className="font-display text-lg text-itr-ink mb-4">Ajouter un journaliste</h2>
+      <form onSubmit={handleSubmit} className="bg-white rounded-xl p-5 space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <input name="first_name" placeholder="Prénom" value={form.first_name} onChange={handleChange} className={`w-full ${inputClass}`} />
+            {fieldErrors.first_name && <p className="text-xs text-itr-red mt-1">{fieldErrors.first_name[0]}</p>}
+          </div>
+          <div>
+            <input name="last_name" placeholder="Nom" value={form.last_name} onChange={handleChange} className={`w-full ${inputClass}`} />
+            {fieldErrors.last_name && <p className="text-xs text-itr-red mt-1">{fieldErrors.last_name[0]}</p>}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <input name="username" required placeholder="Nom d'utilisateur" value={form.username} onChange={handleChange} className={`w-full ${inputClass}`} />
+            {fieldErrors.username && <p className="text-xs text-itr-red mt-1">{fieldErrors.username[0]}</p>}
+          </div>
+          <div>
+            <input name="email" type="email" required placeholder="Email" value={form.email} onChange={handleChange} className={`w-full ${inputClass}`} />
+            {fieldErrors.email && <p className="text-xs text-itr-red mt-1">{fieldErrors.email[0]}</p>}
+          </div>
+        </div>
+        <div>
+          <input name="password" type="password" required placeholder="Mot de passe" value={form.password} onChange={handleChange} className={`w-full ${inputClass}`} />
+          {fieldErrors.password && <p className="text-xs text-itr-red mt-1">{fieldErrors.password[0]}</p>}
+        </div>
+        {formError && <p className="text-sm text-itr-red">{formError}</p>}
+        {success && <p className="text-sm text-green-700">{success}</p>}
+        <button
+          disabled={saving}
+          className="flex items-center gap-1.5 bg-itr-blue hover:bg-itr-blue-dark text-white text-sm font-semibold rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
+        >
+          <UserPlus size={15} /> {saving ? "Création..." : "Créer le compte journaliste"}
+        </button>
+      </form>
+    </section>
+  );
+}
 
 export default function AdminUsers() {
   const { user: currentUser } = useAuth();
-  const isSuperAdmin = currentUser?.role === "super_admin";
 
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -60,12 +129,11 @@ export default function AdminUsers() {
         <ArrowLeft size={15} /> Retour au tableau de bord
       </Link>
 
-      <h1 className="font-display text-2xl text-itr-ink mb-1">Utilisateurs</h1>
-      <p className="text-gray-500 mb-6">
-        {isSuperAdmin
-          ? "En tant que super administrateur, vous pouvez attribuer n'importe quel rôle."
-          : "Les rôles Administrateur et Super administrateur sont réservés au super administrateur."}
-      </p>
+      <h1 className="font-display text-2xl text-itr-ink mb-6">Utilisateurs</h1>
+
+      <CreateJournalistForm onCreated={load} />
+
+      <h2 className="font-display text-lg text-itr-ink mb-4">Tous les utilisateurs</h2>
 
       <input
         value={search}
@@ -106,13 +174,7 @@ export default function AdminUsers() {
                           className="rounded-lg px-2 py-1.5 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none disabled:opacity-50"
                         >
                           {ROLE_OPTIONS.map((r) => (
-                            <option
-                              key={r.value}
-                              value={r.value}
-                              disabled={!isSuperAdmin && SENSITIVE_ROLES.includes(r.value)}
-                            >
-                              {r.label}
-                            </option>
+                            <option key={r.value} value={r.value}>{r.label}</option>
                           ))}
                         </select>
                         {isSelf && <p className="text-xs text-gray-400 mt-1">Vous ne pouvez pas modifier votre propre rôle.</p>}

@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from apps.core.permissions import IsJournalist, IsOwnerOrReadOnly, CanValidateArticle, IsAdminOrSuperAdmin
+from apps.core.permissions import IsJournalist, IsOwnerOrReadOnly, CanValidateArticle, IsAdmin
 from apps.newsroom.models import ArticleReview
 from ..models import Category, Tag, Article, Comment
 from .serializers import (
@@ -21,7 +21,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            return [IsAdminOrSuperAdmin()]
+            return [IsAdmin()]
         return super().get_permissions()
 
 
@@ -81,7 +81,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"], permission_classes=[CanValidateArticle])
     def review(self, request, slug=None):
-        """Le rédacteur en chef valide ou rejette un article."""
+        """L'administrateur valide ou rejette un article."""
         article = self.get_object()
         decision = request.data.get("decision")  # "approve" | "reject"
         comment = request.data.get("comment", "")
@@ -102,6 +102,18 @@ class ArticleViewSet(viewsets.ModelViewSet):
             article=article, actor=request.user, action=review_action, comment=comment,
         )
         return Response({"status": article.status})
+
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
+    def like(self, request, slug=None):
+        """Un abonné (ou plus) aime/n'aime plus un article — bascule (toggle)."""
+        article = self.get_object()
+        if article.liked_by.filter(pk=request.user.pk).exists():
+            article.liked_by.remove(request.user)
+            liked = False
+        else:
+            article.liked_by.add(request.user)
+            liked = True
+        return Response({"liked": liked, "likes_count": article.liked_by.count()})
 
 
 class CommentViewSet(viewsets.ModelViewSet):

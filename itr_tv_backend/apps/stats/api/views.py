@@ -1,7 +1,7 @@
 from django.db.models import Sum, Count
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from apps.core.permissions import IsAdminOrSuperAdmin
+from apps.core.permissions import IsAdmin
 from apps.articles.models import Article
 from apps.webtv.models import Video, LiveStream
 
@@ -9,7 +9,7 @@ from apps.webtv.models import Video, LiveStream
 class DashboardView(APIView):
     """Tableau de bord global — statistiques d'audience (cahier des charges §4.8)."""
 
-    permission_classes = [IsAdminOrSuperAdmin]
+    permission_classes = [IsAdmin]
 
     def get(self, request):
         articles = Article.objects.filter(status=Article.Status.PUBLISHED)
