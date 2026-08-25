@@ -4,11 +4,8 @@ plutôt qu'une base vide. Idempotent : relance la commande pour repartir
 d'un jeu de données propre, les anciennes entrées de démo sont supprimées
 avant recréation (identifiées par le préfixe "demo-").
 """
-import shutil
 from datetime import timedelta
-from pathlib import Path
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -20,24 +17,23 @@ from apps.webtv.models import LiveStream, Program, Video
 
 User = get_user_model()
 
-MEDIA_BASE_URL = "http://localhost:8000/media/demo"
 DEMO_PASSWORD = "Demo1234!"
 
 CATEGORIES = ["Politique", "Économie", "Société", "Culture", "Sport", "International", "Technologies"]
 
 ARTICLES = [
-    ("Le gouvernement annonce un plan de relance pour les PME béninoises", "Politique", 1),
-    ("Cotonou accueille le sommet régional sur le climat", "International", 2),
-    ("La Coupe d'Afrique des Nations : le Bénin qualifié pour les quarts", "Sport", 3),
-    ("Nouvelle ligne de bus rapide entre Cotonou et Porto-Novo dès janvier", "Société", 1),
-    ("Le franc CFA face aux incertitudes économiques régionales", "Économie", 2),
-    ("Portrait : ces jeunes entrepreneurs qui réinventent l'agriculture locale", "Économie", 3),
-    ("Festival international du film de Ouidah : la programmation dévoilée", "Culture", 1),
-    ("Éducation : vers une réforme du baccalauréat béninois", "Société", 2),
-    ("Santé publique : campagne nationale de vaccination lancée", "Société", 3),
-    ("Le Bénin renforce ses liens diplomatiques avec le Nigeria", "International", 1),
-    ("Technologies : le numérique s'impose dans l'administration béninoise", "Technologies", 2),
-    ("Culture : le Vodun Days attire un record de visiteurs à Ouidah", "Culture", 3),
+    ("Le gouvernement annonce un plan de relance pour les PME béninoises", "Politique"),
+    ("Cotonou accueille le sommet régional sur le climat", "International"),
+    ("La Coupe d'Afrique des Nations : le Bénin qualifié pour les quarts", "Sport"),
+    ("Nouvelle ligne de bus rapide entre Cotonou et Porto-Novo dès janvier", "Société"),
+    ("Le franc CFA face aux incertitudes économiques régionales", "Économie"),
+    ("Portrait : ces jeunes entrepreneurs qui réinventent l'agriculture locale", "Économie"),
+    ("Festival international du film de Ouidah : la programmation dévoilée", "Culture"),
+    ("Éducation : vers une réforme du baccalauréat béninois", "Société"),
+    ("Santé publique : campagne nationale de vaccination lancée", "Société"),
+    ("Le Bénin renforce ses liens diplomatiques avec le Nigeria", "International"),
+    ("Technologies : le numérique s'impose dans l'administration béninoise", "Technologies"),
+    ("Culture : le Vodun Days attire un record de visiteurs à Ouidah", "Culture"),
 ]
 
 EXCERPT = (
@@ -57,7 +53,6 @@ class Command(BaseCommand):
     help = "Remplit la base avec un jeu de données de démonstration réaliste (articles, émissions, vidéos, direct, bannière, breaking news)."
 
     def handle(self, *args, **options):
-        self._copy_media()
         self._clean()
         users = self._create_users()
         categories = self._create_categories()
@@ -77,27 +72,15 @@ class Command(BaseCommand):
         for u in users.values():
             self.stdout.write(f"  - {u.username}  ({u.get_role_display()})")
         self.stdout.write(
-            "\nImages servies depuis " + MEDIA_BASE_URL + " — nécessite que le backend "
-            "tourne sur localhost:8000 (le port par défaut de `manage.py runserver`)."
+            "\nImages : une photo différente par contenu, générée depuis picsum.photos "
+            "(nécessite une connexion internet côté navigateur pour s'afficher)."
         )
 
     # -- media -----------------------------------------------------------
-    def _copy_media(self):
-        src_dir = settings.BASE_DIR.parent / "itr_logos"
-        dest_dir = settings.MEDIA_ROOT / "demo"
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        sources = sorted(src_dir.glob("*.jpeg"))[:6]
-        for i, src in enumerate(sources, start=1):
-            shutil.copy(src, dest_dir / f"cover{i}.jpg")
-        # Miniature dédiée pour les émissions/vidéos, réutilise le logo complet du front.
-        front_logo = settings.BASE_DIR.parent / "itr_tv_frontend" / "src" / "assets" / "logo-full.jpeg"
-        if front_logo.exists():
-            shutil.copy(front_logo, dest_dir / "program.jpg")
-        self.n_covers = max(len(sources), 1)
-
-    def _cover(self, i):
-        n = getattr(self, "n_covers", 1)
-        return f"{MEDIA_BASE_URL}/cover{(i % n) + 1}.jpg"
+    def _image(self, key, width=800, height=450):
+        """Une image différente par élément (clé unique = photo stable et reproductible),
+        hébergée sur le web plutôt que recyclée localement."""
+        return f"https://picsum.photos/seed/itrtv-{key}/{width}/{height}"
 
     # -- cleanup -----------------------------------------------------------
     def _clean(self):
@@ -113,9 +96,9 @@ class Command(BaseCommand):
     # -- users -----------------------------------------------------------
     def _create_users(self):
         specs = [
-            ("demo_journaliste", User.Role.JOURNALISTE, "Awa", "Sossou"),
+            ("asossou", User.Role.JOURNALISTE, "Awa", "Sossou"),
             # L'administrateur fait aussi office de rédacteur en chef (valide les articles).
-            ("demo_admin", User.Role.ADMIN, "Fabrice", "Hounkpê"),
+            ("fhounkpe", User.Role.ADMIN, "Fabrice", "Hounkpê"),
         ]
         users = {}
         for username, role, first_name, last_name in specs:
@@ -146,13 +129,13 @@ class Command(BaseCommand):
         validator = users[User.Role.ADMIN]
         now = timezone.now()
         articles = []
-        for i, (title, cat_name, cover_idx) in enumerate(ARTICLES):
+        for i, (title, cat_name) in enumerate(ARTICLES):
             article = Article.objects.create(
                 title=title,
                 slug=f"demo-article-{i + 1}",
                 excerpt=EXCERPT,
                 content=CONTENT,
-                cover_image=self._cover(cover_idx),
+                cover_image=self._image(f"article-{i + 1}"),
                 category=categories[cat_name],
                 author=author,
                 validated_by=validator,
@@ -173,22 +156,22 @@ class Command(BaseCommand):
     def _create_webtv(self, users):
         program1 = Program.objects.create(
             name="Journal du Soir", slug="demo-journal-du-soir",
-            presenter="Fabrice Hounkpê", thumbnail=f"{MEDIA_BASE_URL}/program.jpg",
+            presenter="Fabrice Hounkpê", thumbnail=self._image("programme-journal-du-soir"),
         )
         program2 = Program.objects.create(
             name="ITR Matin", slug="demo-itr-matin",
-            presenter="Awa Sossou", thumbnail=f"{MEDIA_BASE_URL}/program.jpg",
+            presenter="Awa Sossou", thumbnail=self._image("programme-itr-matin"),
         )
         now = timezone.now()
         live = LiveStream.objects.create(
             title="Demo — Édition spéciale élections", program=program1,
             description="Suivez en direct les résultats et analyses de la soirée électorale.",
-            thumbnail=self._cover(4), stream_url="",
+            thumbnail=self._image("direct-edition-speciale"), stream_url="",
             scheduled_at=now, status=LiveStream.Status.LIVE, peak_viewers=1850,
         )
         LiveStream.objects.create(
             title="Demo — Journal du matin", program=program2,
-            thumbnail=self._cover(5), stream_url="",
+            thumbnail=self._image("direct-journal-du-matin"), stream_url="",
             scheduled_at=now + timedelta(hours=14), status=LiveStream.Status.SCHEDULED,
         )
         for i in range(1, 5):
@@ -196,7 +179,7 @@ class Command(BaseCommand):
                 title=f"Demo — Reportage : la vie à Cotonou #{i}",
                 program=program1 if i % 2 else program2,
                 video_url="https://youtube.com/watch?v=demo",
-                thumbnail=self._cover(i + 1),
+                thumbnail=self._image(f"video-cotonou-{i}"),
                 duration_seconds=180 + i * 40,
                 views_count=1200 - i * 150,
                 source_live=live if i == 1 else None,
@@ -204,18 +187,18 @@ class Command(BaseCommand):
         return program1, live
 
     def _create_ads(self):
-        sponsor = Sponsor.objects.create(name="Demo Sponsor Bénin Telecom", logo=self._cover(2))
+        sponsor = Sponsor.objects.create(name="Demo Sponsor Bénin Telecom", logo=self._image("sponsor-logo"))
         today = timezone.now().date()
         banners = [
             AdBanner.objects.create(
                 sponsor=sponsor, placement=AdBanner.Placement.HOME_TOP,
-                image=self._cover(3), target_url="https://example.com",
+                image=self._image("banniere-home-top"), target_url="https://example.com",
                 start_date=today - timedelta(days=5), end_date=today + timedelta(days=30),
                 is_active=True,
             ),
             AdBanner.objects.create(
                 sponsor=sponsor, placement=AdBanner.Placement.ARTICLE_INLINE,
-                image=self._cover(6), target_url="https://example.com",
+                image=self._image("banniere-article-inline"), target_url="https://example.com",
                 start_date=today - timedelta(days=5), end_date=today + timedelta(days=30),
                 is_active=True,
             ),
