@@ -2,33 +2,73 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const inputClass =
+  "w-full rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none";
+
+function Field({ label, error, children }) {
+  return (
+    <div>
+      <label className="block text-xs font-condensed font-bold uppercase text-gray-500 mb-1">{label}</label>
+      {children}
+      {error && <p className="text-xs text-itr-red mt-1">{error}</p>}
+    </div>
+  );
+}
+
 export default function Auth() {
   const [mode, setMode] = useState("login"); // "login" | "register"
-  const [form, setForm] = useState({ username: "", email: "", password: "", first_name: "", last_name: "" });
-  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    username: "", email: "", password: "", confirm_password: "", first_name: "", last_name: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const switchMode = (next) => {
+    setMode(next);
+    setFieldErrors({});
+    setFormError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setFieldErrors({});
+    setFormError("");
+
+    if (mode === "register" && form.password !== form.confirm_password) {
+      setFieldErrors({ confirm_password: ["Les deux mots de passe ne correspondent pas."] });
+      return;
+    }
+
     setLoading(true);
     try {
       if (mode === "login") {
         await signIn(form.username, form.password);
       } else {
-        await signUp(form);
+        const payload = { ...form };
+        delete payload.confirm_password;
+        await signUp(payload);
       }
       navigate("/");
-    } catch {
-      setError(
-        mode === "login"
-          ? "Identifiants incorrects. Vérifie ton nom d'utilisateur et ton mot de passe."
-          : "Impossible de créer le compte. Vérifie les informations saisies."
-      );
+    } catch (err) {
+      const data = err.response?.data;
+      if (data && typeof data === "object" && !Array.isArray(data)) {
+        if (data.detail) {
+          setFormError(data.detail);
+        } else {
+          setFieldErrors(data);
+        }
+      } else {
+        setFormError(
+          mode === "login"
+            ? "Identifiants incorrects. Vérifie ton nom d'utilisateur et ton mot de passe."
+            : "Impossible de créer le compte. Vérifie les informations saisies."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -39,7 +79,7 @@ export default function Auth() {
       <div className="bg-white rounded-2xl shadow-sm p-8">
         <div className="flex mb-8 rounded-full bg-itr-paper p-1">
           <button
-            onClick={() => setMode("login")}
+            onClick={() => switchMode("login")}
             className={`flex-1 py-2 rounded-full text-sm font-condensed font-bold uppercase transition-colors ${
               mode === "login" ? "bg-itr-blue text-white" : "text-itr-ink"
             }`}
@@ -47,7 +87,7 @@ export default function Auth() {
             Connexion
           </button>
           <button
-            onClick={() => setMode("register")}
+            onClick={() => switchMode("register")}
             className={`flex-1 py-2 rounded-full text-sm font-condensed font-bold uppercase transition-colors ${
               mode === "register" ? "bg-itr-blue text-white" : "text-itr-ink"
             }`}
@@ -59,47 +99,42 @@ export default function Auth() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === "register" && (
             <div className="grid grid-cols-2 gap-3">
-              <input
-                name="first_name"
-                placeholder="Prénom"
-                onChange={handleChange}
-                className="rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
-              />
-              <input
-                name="last_name"
-                placeholder="Nom"
-                onChange={handleChange}
-                className="rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
-              />
+              <Field label="Prénom" error={fieldErrors.first_name?.[0]}>
+                <input name="first_name" value={form.first_name} onChange={handleChange} className={inputClass} />
+              </Field>
+              <Field label="Nom" error={fieldErrors.last_name?.[0]}>
+                <input name="last_name" value={form.last_name} onChange={handleChange} className={inputClass} />
+              </Field>
             </div>
           )}
-          <input
-            name="username"
-            placeholder="Nom d'utilisateur"
-            required
-            onChange={handleChange}
-            className="w-full rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
-          />
-          {mode === "register" && (
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              required
-              onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
-            />
-          )}
-          <input
-            name="password"
-            type="password"
-            placeholder="Mot de passe"
-            required
-            onChange={handleChange}
-            className="w-full rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
-          />
 
-          {error && <p className="text-sm text-itr-red">{error}</p>}
+          <Field label="Nom d'utilisateur" error={fieldErrors.username?.[0]}>
+            <input name="username" required value={form.username} onChange={handleChange} className={inputClass} />
+          </Field>
+
+          {mode === "register" && (
+            <Field label="Email" error={fieldErrors.email?.[0]}>
+              <input name="email" type="email" required value={form.email} onChange={handleChange} className={inputClass} />
+            </Field>
+          )}
+
+          <Field label="Mot de passe" error={fieldErrors.password?.[0]}>
+            <input
+              name="password" type="password" required value={form.password} onChange={handleChange}
+              className={inputClass}
+            />
+          </Field>
+
+          {mode === "register" && (
+            <Field label="Confirmer le mot de passe" error={fieldErrors.confirm_password?.[0]}>
+              <input
+                name="confirm_password" type="password" required value={form.confirm_password}
+                onChange={handleChange} className={inputClass}
+              />
+            </Field>
+          )}
+
+          {formError && <p className="text-sm text-itr-red">{formError}</p>}
 
           <button
             disabled={loading}

@@ -10,23 +10,46 @@ export default function Actualites() {
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("categorie") || "";
-  const [query, setQuery] = useState("");
+  const [queryInput, setQueryInput] = useState(searchParams.get("recherche") || "");
+  const [debouncedQuery, setDebouncedQuery] = useState(queryInput);
 
   useEffect(() => {
     api.getCategories().then(({ data }) => setCategories(data.results || data)).catch(() => {});
   }, []);
 
+  // Débounce : une recherche par API après une pause de frappe, pas à chaque caractère.
+  useEffect(() => {
+    const timeout = setTimeout(() => setDebouncedQuery(queryInput), 300);
+    return () => clearTimeout(timeout);
+  }, [queryInput]);
+
   useEffect(() => {
     setLoading(true);
     const params = { status: "published", ordering: "-published_at" };
     if (activeCategory) params.category = activeCategory;
-    if (query) params.search = query;
+    if (debouncedQuery) params.search = debouncedQuery;
     api
       .getArticles(params)
       .then(({ data }) => setArticles(data.results || data))
       .catch(() => setArticles([]))
       .finally(() => setLoading(false));
-  }, [activeCategory, query]);
+  }, [activeCategory, debouncedQuery]);
+
+  const setCategory = (categoryId) => {
+    const next = new URLSearchParams(searchParams);
+    if (categoryId) next.set("categorie", categoryId);
+    else next.delete("categorie");
+    setSearchParams(next);
+  };
+
+  const handleQueryChange = (e) => {
+    const value = e.target.value;
+    setQueryInput(value);
+    const next = new URLSearchParams(searchParams);
+    if (value) next.set("recherche", value);
+    else next.delete("recherche");
+    setSearchParams(next, { replace: true });
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -37,7 +60,8 @@ export default function Actualites() {
           <input
             type="search"
             placeholder="Rechercher un article..."
-            onChange={(e) => setQuery(e.target.value)}
+            value={queryInput}
+            onChange={handleQueryChange}
             className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 bg-white text-sm focus:border-itr-blue focus:outline-none"
           />
         </div>
@@ -45,7 +69,7 @@ export default function Actualites() {
 
       <div className="flex flex-wrap gap-2 mb-8">
         <button
-          onClick={() => setSearchParams({})}
+          onClick={() => setCategory(null)}
           className={`px-4 py-1.5 rounded-full text-sm font-condensed font-semibold uppercase transition-colors ${
             !activeCategory ? "bg-itr-blue text-white" : "bg-white text-itr-ink border border-gray-200 hover:border-itr-blue"
           }`}
@@ -55,7 +79,7 @@ export default function Actualites() {
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setSearchParams({ categorie: cat.id })}
+            onClick={() => setCategory(cat.id)}
             className={`px-4 py-1.5 rounded-full text-sm font-condensed font-semibold uppercase transition-colors ${
               activeCategory === String(cat.id)
                 ? "bg-itr-blue text-white"

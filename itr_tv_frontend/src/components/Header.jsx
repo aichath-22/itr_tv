@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, Search, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo-full.jpeg";
@@ -16,7 +16,19 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const { user, signOut, hasRoleAtLeast } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const term = searchValue.trim();
+    navigate(term ? `/actualites?recherche=${encodeURIComponent(term)}` : "/actualites");
+    setSearchOpen(false);
+    setSearchValue("");
+    setOpen(false);
+  };
 
   const linkClass = ({ isActive }) =>
     `font-condensed font-semibold uppercase text-sm tracking-wide px-3 py-2 transition-colors ${
@@ -39,12 +51,28 @@ export default function Header() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <button
-            aria-label="Rechercher"
-            className="p-2 rounded-full hover:bg-itr-paper text-itr-ink"
-          >
-            <Search size={20} />
-          </button>
+          {searchOpen ? (
+            <form onSubmit={handleSearchSubmit} className="flex items-center">
+              <input
+                autoFocus
+                type="search"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onBlur={() => !searchValue && setSearchOpen(false)}
+                placeholder="Rechercher un article..."
+                aria-label="Rechercher un article"
+                className="w-56 rounded-full px-4 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
+              />
+            </form>
+          ) : (
+            <button
+              aria-label="Rechercher"
+              onClick={() => setSearchOpen(true)}
+              className="p-2 rounded-full hover:bg-itr-paper text-itr-ink"
+            >
+              <Search size={20} />
+            </button>
+          )}
           {user ? (
             <div className="flex items-center gap-2">
               {hasRoleAtLeast("journaliste") && (
@@ -84,6 +112,16 @@ export default function Header() {
 
       {open && (
         <div className="lg:hidden border-t border-gray-100 bg-white">
+          <form onSubmit={handleSearchSubmit} className="px-4 pt-3">
+            <input
+              type="search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="Rechercher un article..."
+              aria-label="Rechercher un article"
+              className="w-full rounded-full px-4 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
+            />
+          </form>
           <nav className="flex flex-col px-4 py-2">
             {NAV_LINKS.map((link) => (
               <NavLink
