@@ -21,6 +21,12 @@ export default function Header() {
   const { user, signOut, hasRoleAtLeast } = useAuth();
   const navigate = useNavigate();
 
+  const handleSignOut = () => {
+    if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) {
+      signOut();
+    }
+  };
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const term = searchValue.trim();
@@ -84,7 +90,7 @@ export default function Header() {
                 </Link>
               )}
               <button
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="flex items-center gap-2 bg-itr-ink text-white rounded-full px-4 py-2 text-sm font-semibold hover:bg-black transition-colors"
               >
                 <User size={16} /> {user.username}
@@ -151,8 +157,10 @@ export default function Header() {
                 )}
                 <button
                   onClick={() => {
-                    signOut();
-                    setOpen(false);
+                    if (window.confirm("Voulez-vous vraiment vous déconnecter ?")) {
+                      signOut();
+                      setOpen(false);
+                    }
                   }}
                   className="py-3 text-left font-condensed font-semibold uppercase text-sm text-itr-ink"
                 >

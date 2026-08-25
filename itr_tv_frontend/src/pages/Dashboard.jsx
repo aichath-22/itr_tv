@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2, Users2, Megaphone, Tv } from "lucide-react";
+import { CheckCircle, XCircle, Send, BarChart3, FileText, Plus, Pencil, Trash2, Users2, Megaphone, Tv, Eye } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
 
@@ -228,10 +228,15 @@ export default function Dashboard() {
             <div className="space-y-3">
               {pendingArticles.map((a) => (
                 <div key={a.id} className="bg-white rounded-xl p-4 flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-condensed font-semibold text-itr-ink">{a.title}</p>
-                    <p className="text-xs text-gray-400">Par {a.author_name}</p>
-                  </div>
+                  <Link
+                    to={`/tableau-de-bord/articles/${a.slug}/modifier`}
+                    className="flex-1 min-w-0 group"
+                  >
+                    <p className="font-condensed font-semibold text-itr-ink group-hover:text-itr-blue transition-colors flex items-center gap-1.5">
+                      {a.title} <Eye size={13} className="text-gray-300 group-hover:text-itr-blue shrink-0" />
+                    </p>
+                    <p className="text-xs text-gray-400">Par {a.author_name} · cliquer pour lire et décider</p>
+                  </Link>
                   <div className="flex gap-2 shrink-0">
                     <button
                       disabled={busySlug === a.slug}

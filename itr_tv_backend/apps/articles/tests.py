@@ -74,6 +74,40 @@ class ArticleCreationTests(APITestCase):
         self.assertEqual(article.status, Article.Status.PENDING)
         self.assertEqual(article.reviews.count(), 1)
 
+    def test_editing_published_article_as_author_resubmits_for_validation(self):
+        admin = User.objects.create_user(username="admin_reedit", password="pass12345", role=User.Role.ADMIN)
+        article = Article.objects.create(
+            title="Article déjà publié", slug="article-deja-publie", content="Contenu initial.",
+            category=self.category, author=self.journalist, validated_by=admin,
+            status=Article.Status.PUBLISHED,
+        )
+        self.client.force_authenticate(self.journalist)
+        response = self.client.patch(
+            f"/api/v1/articles/{article.slug}/", {"content": "Contenu corrigé."}, format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        article.refresh_from_db()
+        self.assertEqual(article.status, Article.Status.PENDING)
+        self.assertEqual(article.content, "Contenu corrigé.")
+        self.assertEqual(article.reviews.count(), 1)
+        self.assertEqual(article.reviews.first().action, "submitted")
+
+    def test_editing_published_article_as_admin_stays_published(self):
+        admin = User.objects.create_user(username="admin_reedit2", password="pass12345", role=User.Role.ADMIN)
+        article = Article.objects.create(
+            title="Article publié par admin", slug="article-publie-admin", content="Contenu initial.",
+            category=self.category, author=self.journalist, validated_by=admin,
+            status=Article.Status.PUBLISHED,
+        )
+        self.client.force_authenticate(admin)
+        response = self.client.patch(
+            f"/api/v1/articles/{article.slug}/", {"content": "Correction mineure."}, format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.data)
+        article.refresh_from_db()
+        self.assertEqual(article.status, Article.Status.PUBLISHED)
+        self.assertEqual(article.reviews.count(), 0)
+
 
 class ArticleLikeTests(APITestCase):
     def setUp(self):

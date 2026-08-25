@@ -1,5 +1,6 @@
 from django.utils.text import slugify
 from rest_framework import serializers
+from apps.newsroom.models import ArticleReview
 from ..models import Category, Tag, Article, Comment
 
 
@@ -88,6 +89,26 @@ class ArticleWriteSerializer(serializers.ModelSerializer):
             slug = f"{base_slug}-{suffix}"
         validated_data["slug"] = slug
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """Si un journaliste modifie son propre article déjà publié, la
+        modification repasse en attente de validation plutôt que d'écraser
+        directement la version publiée — seul l'admin (rédacteur en chef)
+        peut modifier un article publié sans repasser par ce circuit."""
+        request = self.context.get("request")
+        was_published = instance.status == Article.Status.PUBLISHED
+        needs_resubmit = was_published and request and not request.user.can_validate_articles
+
+        instance = super().update(instance, validated_data)
+
+        if needs_resubmit:
+            instance.status = Article.Status.PENDING
+            instance.save(update_fields=["status"])
+            ArticleReview.objects.create(
+                article=instance, actor=request.user, action=ArticleReview.Action.SUBMITTED,
+                comment="Article modifié après publication : resoumis à validation.",
+            )
+        return instance
 
     def to_representation(self, instance):
         # Renvoie la représentation détaillée (catégorie/tags imbriqués) après écriture.

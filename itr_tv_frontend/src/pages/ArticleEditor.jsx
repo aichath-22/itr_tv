@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { Send, Trash2, ArrowLeft } from "lucide-react";
+import { Send, Trash2, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
 
@@ -38,7 +38,7 @@ export default function ArticleEditor() {
   const { slug } = useParams();
   const isEditing = Boolean(slug);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, hasRoleAtLeast } = useAuth();
 
   const [form, setForm] = useState({
     title: "", excerpt: "", content: "", cover_image: "", attached_pdf: "",
@@ -53,6 +53,7 @@ export default function ArticleEditor() {
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
 
@@ -146,6 +147,21 @@ export default function ArticleEditor() {
     } catch {
       setFormError("Impossible de soumettre cet article à validation.");
       setSubmitting(false);
+    }
+  };
+
+  const handleReview = async (decision) => {
+    let comment = "";
+    if (decision === "reject") {
+      comment = window.prompt("Raison du rejet (optionnel) :") || "";
+    }
+    setReviewing(true);
+    try {
+      await api.reviewArticle(slug, decision, comment);
+      navigate("/tableau-de-bord");
+    } catch {
+      setFormError("Impossible d'enregistrer cette décision.");
+      setReviewing(false);
     }
   };
 
@@ -274,6 +290,27 @@ export default function ArticleEditor() {
               >
                 <Send size={14} /> {submitting ? "Envoi..." : "Soumettre à validation"}
               </button>
+            )}
+
+            {isEditing && article?.status === "pending" && hasRoleAtLeast("admin") && (
+              <>
+                <button
+                  type="button"
+                  disabled={reviewing}
+                  onClick={() => handleReview("approve")}
+                  className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full px-5 py-2 text-sm transition-colors disabled:opacity-50"
+                >
+                  <CheckCircle size={14} /> {reviewing ? "..." : "Valider"}
+                </button>
+                <button
+                  type="button"
+                  disabled={reviewing}
+                  onClick={() => handleReview("reject")}
+                  className="flex items-center gap-1.5 bg-itr-red hover:bg-itr-red-dark text-white font-semibold rounded-full px-5 py-2 text-sm transition-colors disabled:opacity-50"
+                >
+                  <XCircle size={14} /> {reviewing ? "..." : "Rejeter"}
+                </button>
+              </>
             )}
 
             {isEditing && (
