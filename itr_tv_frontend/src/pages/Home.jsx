@@ -125,7 +125,7 @@ export default function Home() {
       <section className="bg-itr-ink text-white py-10">
         <div className="mx-auto max-w-7xl px-4">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display text-xl">Web TV — Rediffusions</h2>
+            <h2 className="font-display text-xl">Rediffusions Web TV</h2>
             <Link to="/webtv" className="text-itr-blue text-sm font-semibold flex items-center gap-1 hover:gap-2 transition-all">
               Bibliothèque vidéo <ArrowRight size={15} />
             </Link>

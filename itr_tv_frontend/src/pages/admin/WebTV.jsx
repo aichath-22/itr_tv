@@ -150,7 +150,7 @@ function LiveStreamsTab({ liveStreams, programs, reload }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input name="title" required placeholder="Titre du direct" value={form.title} onChange={handleChange} className={inputClass} />
           <select name="program" value={form.program} onChange={handleChange} className={inputClass}>
-            <option value="">— Émission (optionnel) —</option>
+            <option value="">Choisir une émission (optionnel)</option>
             {programs.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
         </div>
@@ -246,17 +246,17 @@ function VideosTab({ videos, programs, categories, liveStreams, reload }) {
         <input name="video_url" type="url" required placeholder="URL de la vidéo (YouTube ou hébergée)" value={form.video_url} onChange={handleChange} className={`w-full ${inputClass}`} />
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <select name="program" value={form.program} onChange={handleChange} className={inputClass}>
-            <option value="">— Émission —</option>
+            <option value="">Choisir une émission</option>
             {programs.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           <select name="category" value={form.category} onChange={handleChange} className={inputClass}>
-            <option value="">— Catégorie —</option>
+            <option value="">Choisir une catégorie</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
           <input name="duration_seconds" type="number" min="0" placeholder="Durée (secondes)" value={form.duration_seconds} onChange={handleChange} className={inputClass} />
         </div>
         <select name="source_live" value={form.source_live} onChange={handleChange} className={`w-full ${inputClass}`}>
-          <option value="">— Rediffusion d'un direct (optionnel) —</option>
+          <option value="">Rattacher à un direct (optionnel)</option>
           {liveStreams.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
         </select>
         {error && <p className="text-sm text-itr-red">{error}</p>}

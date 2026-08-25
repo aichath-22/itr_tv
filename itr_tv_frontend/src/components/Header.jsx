@@ -39,7 +39,7 @@ export default function Header() {
     <header className="bg-white sticky top-0 z-40 shadow-sm">
       <div className="mx-auto max-w-7xl px-4 flex items-center justify-between h-16 gap-4">
         <Link to="/" className="shrink-0 flex items-center h-full py-2">
-          <img src={logo} alt="ITR TV — L'Information en Temps Réel" className="h-12 w-auto object-contain" />
+          <img src={logo} alt="ITR TV, L'Information en Temps Réel" className="h-12 w-auto object-contain" />
         </Link>
 
         <nav className="hidden lg:flex items-center">

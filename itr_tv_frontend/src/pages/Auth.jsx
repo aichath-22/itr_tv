@@ -174,7 +174,7 @@ export default function Auth() {
             L'info en temps réel.
           </h2>
           <p className="text-white/70 max-w-xs leading-relaxed">
-            Articles, directs et reportages béninois — un seul endroit pour suivre, commenter et partager l'actualité qui compte.
+            Articles, directs et reportages béninois : un seul endroit pour suivre, commenter et partager l'actualité qui compte.
           </p>
           <div className="mt-10 inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 w-fit">
             <span className="h-2 w-2 rounded-full bg-itr-red animate-pulse" />

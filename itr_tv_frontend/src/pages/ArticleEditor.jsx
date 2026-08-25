@@ -186,7 +186,7 @@ export default function ArticleEditor() {
 
       {!canEdit && (
         <p className="text-sm text-itr-red bg-itr-red/10 rounded-lg p-3 mb-6">
-          Cet article appartient à un autre journaliste — vous pouvez le consulter mais pas l'enregistrer.
+          Cet article appartient à un autre journaliste. Vous pouvez le consulter mais pas l'enregistrer.
         </p>
       )}
 
@@ -214,7 +214,7 @@ export default function ArticleEditor() {
 
         <Field label="Catégorie" error={fieldErrors.category?.[0]}>
           <select name="category" required value={form.category} onChange={handleChange} className={inputClass} disabled={!canEdit}>
-            <option value="">— Choisir une catégorie —</option>
+            <option value="">Choisir une catégorie</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}

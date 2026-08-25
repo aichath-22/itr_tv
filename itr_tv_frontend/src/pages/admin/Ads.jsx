@@ -4,10 +4,10 @@ import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import * as api from "../../api/endpoints";
 
 const PLACEMENTS = [
-  { value: "home_top", label: "Accueil — Haut" },
-  { value: "home_sidebar", label: "Accueil — Latéral" },
-  { value: "article_inline", label: "Article — Intégré" },
-  { value: "webtv_preroll", label: "Web TV — Pré-roll" },
+  { value: "home_top", label: "Accueil (haut de page)" },
+  { value: "home_sidebar", label: "Accueil (barre latérale)" },
+  { value: "article_inline", label: "Article (intégré)" },
+  { value: "webtv_preroll", label: "Web TV (pré-roll)" },
 ];
 
 const inputClass = "rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none";
@@ -171,7 +171,7 @@ export default function AdminAds() {
             <form onSubmit={handleSubmit} className="bg-white rounded-xl p-5 mb-5 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <select name="sponsor" required value={form.sponsor} onChange={handleChange} className={inputClass}>
-                  <option value="">— Sponsor —</option>
+                  <option value="">Choisir un sponsor</option>
                   {sponsors.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
                 <select name="placement" value={form.placement} onChange={handleChange} className={inputClass}>
@@ -208,7 +208,7 @@ export default function AdminAds() {
                 <div key={b.id} className="bg-white rounded-xl p-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="font-condensed font-semibold text-itr-ink">
-                      {b.sponsor.name} — {PLACEMENTS.find((p) => p.value === b.placement)?.label}
+                      {b.sponsor.name} · {PLACEMENTS.find((p) => p.value === b.placement)?.label}
                     </p>
                     <p className="text-xs text-gray-400">
                       {b.start_date} → {b.end_date} · {b.is_active ? "Active" : "Inactive"} ·{" "}

@@ -21,4 +21,4 @@ class ArticleReview(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.article} — {self.get_action_display()}"
+        return f"{self.article} ({self.get_action_display()})"

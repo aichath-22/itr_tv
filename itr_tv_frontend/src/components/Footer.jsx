@@ -35,7 +35,7 @@ export default function Footer() {
         <div>
           <img src={logo} alt="ITR TV" className="h-14 w-auto object-contain bg-white rounded-lg p-1 mb-4" />
           <p className="text-sm text-white/70 leading-relaxed">
-            Média numérique béninois dédié à l'information en continu — articles, direct, reportages et interviews.
+            Média numérique béninois dédié à l'information en continu : articles, direct, reportages et interviews.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-white/10 py-4 text-center text-xs text-white/50">
-        © {new Date().getFullYear()} ITR TV — InfosEnTempsRéel. Tous droits réservés. — itrtv.bj
+        © {new Date().getFullYear()} ITR TV (InfosEnTempsRéel). Tous droits réservés. itrtv.bj
       </div>
     </footer>
   );
