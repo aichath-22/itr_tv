@@ -56,6 +56,7 @@ export default function ArticleEditor() {
   const [reviewing, setReviewing] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     api.getCategories().then(({ data }) => setCategories(data.results || data)).catch(() => {});
@@ -85,7 +86,10 @@ export default function ArticleEditor() {
       .finally(() => setLoading(false));
   }, [slug, isEditing]);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (successMessage) setSuccessMessage("");
+  };
 
   const toggleTag = (tagId) => {
     setForm((f) => ({
@@ -117,10 +121,16 @@ export default function ArticleEditor() {
     setSaving(true);
     setFieldErrors({});
     setFormError("");
+    setSuccessMessage("");
     try {
       if (isEditing) {
         const { data } = await api.updateArticle(slug, buildPayload());
         setArticle(data);
+        setSuccessMessage(
+          data.status === "pending" && article?.status === "published"
+            ? "Modifications enregistrées — l'article repasse en attente de validation avant remise en ligne."
+            : "Modifications enregistrées."
+        );
       } else {
         const { data } = await api.createArticle(buildPayload());
         navigate(`/tableau-de-bord/articles/${data.slug}/modifier`, { replace: true });
@@ -271,6 +281,9 @@ export default function ArticleEditor() {
         </Field>
 
         {formError && <p className="text-sm text-itr-red">{formError}</p>}
+        {successMessage && (
+          <p className="text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">✓ {successMessage}</p>
+        )}
 
         {canEdit && (
           <div className="flex flex-wrap items-center gap-3 pt-2">
