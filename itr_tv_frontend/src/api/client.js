@@ -2,8 +2,19 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
 
+const tunnelHeaders = () => {
+  // Évite la page d'avertissement interstitielle des tunnels temporaires
+  // (localtunnel/ngrok) lors des tests avec un lien de démo.
+  if (API_URL.includes("loca.lt")) return { "Bypass-Tunnel-Reminder": "true" };
+  if (API_URL.includes("ngrok-free.app") || API_URL.includes("ngrok.app")) {
+    return { "ngrok-skip-browser-warning": "true" };
+  }
+  return {};
+};
+
 export const apiClient = axios.create({
   baseURL: API_URL,
+  headers: tunnelHeaders(),
 });
 
 apiClient.interceptors.request.use((config) => {

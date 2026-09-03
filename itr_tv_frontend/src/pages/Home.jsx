@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Radio, PlayCircle, ArrowRight } from "lucide-react";
 import * as api from "../api/endpoints";
 import ArticleCard from "../components/ArticleCard";
+import AdBanner from "../components/AdBanner";
 
 export default function Home() {
   const [articles, setArticles] = useState([]);
@@ -36,6 +37,10 @@ export default function Home() {
 
   return (
     <div>
+      <div className="mx-auto max-w-7xl px-4 pt-4">
+        <AdBanner placement="home_top" />
+      </div>
+
       {/* HERO */}
       <section className="bg-itr-blue-deep text-white">
         <div className="mx-auto max-w-7xl px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -74,32 +79,36 @@ export default function Home() {
           )}
 
           {/* Live block */}
-          <div className="bg-black/30 rounded-xl p-5 flex flex-col">
-            <div className="flex items-center gap-2 text-itr-red font-condensed font-bold uppercase text-sm mb-3">
-              <Radio size={16} className={live?.status === "live" ? "animate-pulse" : ""} />
-              {live?.status === "live" ? "En direct maintenant" : "Prochain direct"}
-            </div>
-            <div className="aspect-video bg-black/40 rounded-lg mb-3 flex items-center justify-center">
-              <PlayCircle size={40} className="text-white/50" />
-            </div>
-            <p className="font-display text-lg leading-snug mb-1">
-              {live ? live.title : "Aucun direct programmé"}
-            </p>
-            {live && (
-              <p className="text-white/60 text-sm font-condensed">
-                {new Date(live.scheduled_at).toLocaleString("fr-FR", {
-                  weekday: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+          <div className="flex flex-col gap-4">
+            <div className="bg-black/30 rounded-xl p-5 flex flex-col">
+              <div className="flex items-center gap-2 text-itr-red font-condensed font-bold uppercase text-sm mb-3">
+                <Radio size={16} className={live?.status === "live" ? "animate-pulse" : ""} />
+                {live?.status === "live" ? "En direct maintenant" : "Prochain direct"}
+              </div>
+              <div className="aspect-video bg-black/40 rounded-lg mb-3 flex items-center justify-center">
+                <PlayCircle size={40} className="text-white/50" />
+              </div>
+              <p className="font-display text-lg leading-snug mb-1">
+                {live ? live.title : "Aucun direct programmé"}
               </p>
-            )}
-            <Link
-              to="/webtv"
-              className="mt-auto pt-4 text-itr-blue font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all"
-            >
-              Voir la Web TV <ArrowRight size={16} />
-            </Link>
+              {live && (
+                <p className="text-white/60 text-sm font-condensed">
+                  {new Date(live.scheduled_at).toLocaleString("fr-FR", {
+                    weekday: "long",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              )}
+              <Link
+                to="/webtv"
+                className="mt-auto pt-4 text-itr-blue font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+              >
+                Voir la Web TV <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            <AdBanner placement="home_sidebar" className="bg-black/30 rounded-xl p-3" />
           </div>
         </div>
       </section>

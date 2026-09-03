@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { Eye, Calendar, Send, Heart, Share2 } from "lucide-react";
 import * as api from "../api/endpoints";
 import { useAuth } from "../context/AuthContext";
+import AdBanner from "../components/AdBanner";
 
 const SHARE_LINKS = (url, title) => [
   { label: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
@@ -127,6 +128,10 @@ export default function ArticleDetail() {
 
       <div className="prose prose-lg max-w-none mt-8 whitespace-pre-line text-itr-ink leading-relaxed">
         {article.content}
+      </div>
+
+      <div className="mt-8">
+        <AdBanner placement="article_inline" />
       </div>
 
       {article.tags?.length > 0 && (

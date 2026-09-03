@@ -77,6 +77,9 @@ export const getSponsors = () => apiClient.get("/ads/sponsors/");
 export const createSponsor = (payload) => apiClient.post("/ads/sponsors/", payload);
 export const deleteSponsor = (id) => apiClient.delete(`/ads/sponsors/${id}/`);
 
+export const trackBannerImpression = (id) => apiClient.post(`/ads/banners/${id}/track_impression/`);
+export const trackBannerClick = (id) => apiClient.post(`/ads/banners/${id}/track_click/`);
+
 // --- Newsletter ---
 export const subscribeNewsletter = (email) =>
   apiClient.post("/newsletter/subscribe/", { email });

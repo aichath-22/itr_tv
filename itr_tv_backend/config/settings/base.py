@@ -134,3 +134,13 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173",
 ).split(",")
+
+from corsheaders.defaults import default_headers  # noqa: E402
+
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+    # Évite la page d'avertissement des tunnels temporaires (ngrok/localtunnel)
+    # lors des tests avec un lien de démo.
+    "ngrok-skip-browser-warning",
+    "bypass-tunnel-reminder",
+]
