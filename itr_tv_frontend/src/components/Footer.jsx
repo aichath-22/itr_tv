@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
-import { Radio, Camera, PlaySquare, MessageCircle, Users, Music2, Hash } from "lucide-react";
+import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp, FaLinkedinIn, FaTiktok, FaXTwitter } from "react-icons/fa6";
 import { useState } from "react";
 import * as api from "../api/endpoints";
 import logo from "../assets/logo-compact.jpeg";
 
 const SOCIALS = [
-  { icon: Radio, href: "https://www.facebook.com/profile.php?id=100092600381179", label: "Facebook" },
-  { icon: Camera, href: "https://www.instagram.com/itr_tv/", label: "Instagram" },
-  { icon: PlaySquare, href: "https://www.youtube.com/@InfosenTempsR%C3%A9elTV", label: "YouTube" },
-  { icon: MessageCircle, href: "https://whatsapp.com/channel/0029VaJlAKUDp2Q7oIN36632", label: "WhatsApp" },
-  { icon: Users, href: "https://www.linkedin.com/feed/", label: "LinkedIn" },
-  { icon: Music2, href: "https://www.tiktok.com/@infosentempsreel?lang=fr", label: "TikTok" },
-  { icon: Hash, href: "https://x.com/itr_tv", label: "X" },
+  { icon: FaFacebookF, href: "https://www.facebook.com/profile.php?id=100092600381179", label: "Facebook" },
+  { icon: FaInstagram, href: "https://www.instagram.com/itr_tv/", label: "Instagram" },
+  { icon: FaYoutube, href: "https://www.youtube.com/@InfosenTempsR%C3%A9elTV", label: "YouTube" },
+  { icon: FaWhatsapp, href: "https://whatsapp.com/channel/0029VaJlAKUDp2Q7oIN36632", label: "WhatsApp" },
+  { icon: FaLinkedinIn, href: "https://www.linkedin.com/feed/", label: "LinkedIn" },
+  { icon: FaTiktok, href: "https://www.tiktok.com/@infosentempsreel?lang=fr", label: "TikTok" },
+  { icon: FaXTwitter, href: "https://x.com/itr_tv", label: "X" },
 ];
 
 export default function Footer() {
