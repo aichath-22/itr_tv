@@ -13,6 +13,7 @@ export const getUsers = (search = "") =>
   apiClient.get("/auth/users/", { params: search ? { search } : {} });
 export const updateUser = (id, payload) => apiClient.patch(`/auth/users/${id}/`, payload);
 export const createJournalist = (payload) => apiClient.post("/auth/journalists/", payload);
+export const getTeam = () => apiClient.get("/auth/team/");
 
 // --- Articles ---
 export const getArticles = (params = {}) =>

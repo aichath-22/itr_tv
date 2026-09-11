@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterView, MeView, ThrottledTokenObtainPairView,
-    UserListView, UserDetailView, CreateJournalistView,
+    UserListView, UserDetailView, CreateJournalistView, TeamListView,
 )
 
 urlpatterns = [
@@ -13,4 +13,5 @@ urlpatterns = [
     path("users/", UserListView.as_view(), name="auth-user-list"),
     path("users/<int:pk>/", UserDetailView.as_view(), name="auth-user-detail"),
     path("journalists/", CreateJournalistView.as_view(), name="auth-create-journalist"),
+    path("team/", TeamListView.as_view(), name="auth-team-list"),
 ]

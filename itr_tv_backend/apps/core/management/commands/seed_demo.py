@@ -98,18 +98,22 @@ class Command(BaseCommand):
     # -- users -----------------------------------------------------------
     def _create_users(self):
         specs = [
-            ("asossou", User.Role.JOURNALISTE, "Awa", "Sossou"),
+            ("asossou", User.Role.JOURNALISTE, "Awa", "Sossou",
+             "Journaliste chez ITR TV, spécialisée dans l'actualité politique et économique béninoise."),
             # L'administrateur fait aussi office de rédacteur en chef (valide les articles).
-            ("fhounkpe", User.Role.ADMIN, "Fabrice", "Hounkpê"),
+            ("fhounkpe", User.Role.ADMIN, "Fabrice", "Hounkpê",
+             "Rédacteur en chef d'ITR TV. Supervise la ligne éditoriale et valide chaque publication avant sa mise en ligne."),
         ]
         users = {}
-        for username, role, first_name, last_name in specs:
+        for username, role, first_name, last_name, bio in specs:
             u, _ = User.objects.get_or_create(
                 username=username,
                 defaults={"role": role, "first_name": first_name, "last_name": last_name},
             )
             u.role = role
             u.first_name, u.last_name = first_name, last_name
+            u.bio = bio
+            u.avatar = self._image(f"portrait-{username}", 400, 400)
             u.is_active = True
             u.set_password(DEMO_PASSWORD)
             u.save()

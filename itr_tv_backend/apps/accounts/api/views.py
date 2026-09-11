@@ -3,7 +3,13 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model
 from apps.core.permissions import IsAdmin
-from .serializers import UserSerializer, RegisterSerializer, AdminUserSerializer, CreateJournalistSerializer
+from .serializers import (
+    UserSerializer,
+    RegisterSerializer,
+    AdminUserSerializer,
+    CreateJournalistSerializer,
+    PublicTeamMemberSerializer,
+)
 
 User = get_user_model()
 
@@ -47,6 +53,29 @@ class UserListView(generics.ListAPIView):
     permission_classes = [IsAdmin]
     filter_backends = [filters.SearchFilter]
     search_fields = ["username", "email", "first_name", "last_name"]
+
+
+class TeamListView(generics.ListAPIView):
+    """Équipe éditoriale affichée publiquement sur la page Rédaction :
+    le rédacteur en chef (admin) en premier, puis les journalistes."""
+
+    serializer_class = PublicTeamMemberSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        from django.db.models import Case, IntegerField, Value, When
+
+        order = Case(
+            When(role=User.Role.ADMIN, then=Value(0)),
+            When(role=User.Role.JOURNALISTE, then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField(),
+        )
+        return (
+            User.objects.filter(role__in=[User.Role.ADMIN, User.Role.JOURNALISTE], is_active=True)
+            .annotate(role_order=order)
+            .order_by("role_order", "date_joined")
+        )
 
 
 class UserDetailView(generics.RetrieveUpdateAPIView):

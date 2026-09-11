@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, UserPlus } from "lucide-react";
+import { ArrowLeft, UserPlus, IdCard } from "lucide-react";
 import * as api from "../../api/endpoints";
 import { useAuth } from "../../context/AuthContext";
 
@@ -84,6 +84,62 @@ function CreateJournalistForm({ onCreated }) {
   );
 }
 
+function ProfileEditor({ target, onSaved, onCancel }) {
+  const [avatar, setAvatar] = useState(target.avatar || "");
+  const [bio, setBio] = useState(target.bio || "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const { data } = await api.updateUser(target.id, { avatar, bio });
+      onSaved(data);
+    } catch {
+      setError("Impossible d'enregistrer le profil.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-3 bg-itr-paper rounded-lg p-3 space-y-2">
+      <div>
+        <label className="text-xs font-condensed font-bold uppercase text-gray-400">Photo (URL)</label>
+        <input
+          value={avatar}
+          onChange={(e) => setAvatar(e.target.value)}
+          placeholder="https://..."
+          className="w-full mt-1 rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-condensed font-bold uppercase text-gray-400">Bio (page Rédaction)</label>
+        <textarea
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          rows={3}
+          className="w-full mt-1 rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none resize-none"
+        />
+      </div>
+      {error && <p className="text-xs text-itr-red">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          disabled={saving}
+          onClick={handleSave}
+          className="bg-itr-blue hover:bg-itr-blue-dark text-white text-xs font-semibold rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+        >
+          {saving ? "Enregistrement..." : "Enregistrer"}
+        </button>
+        <button onClick={onCancel} className="text-xs font-semibold text-gray-500 px-3 py-1.5">
+          Annuler
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminUsers() {
   const { user: currentUser } = useAuth();
 
@@ -92,6 +148,7 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [rowErrors, setRowErrors] = useState({});
+  const [editingProfileId, setEditingProfileId] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -150,16 +207,18 @@ export default function AdminUsers() {
                 <th className="px-4 py-3">Utilisateur</th>
                 <th className="px-4 py-3">Rôle</th>
                 <th className="px-4 py-3">Statut</th>
+                <th className="px-4 py-3">Profil (Rédaction)</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={3} className="px-4 py-6 text-gray-400">Chargement...</td></tr>
+                <tr><td colSpan={4} className="px-4 py-6 text-gray-400">Chargement...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={3} className="px-4 py-6 text-gray-400">Aucun utilisateur trouvé.</td></tr>
+                <tr><td colSpan={4} className="px-4 py-6 text-gray-400">Aucun utilisateur trouvé.</td></tr>
               ) : (
                 users.map((u) => {
                   const isSelf = u.id === currentUser?.id;
+                  const showsOnRedaction = u.role === "admin" || u.role === "journaliste";
                   return (
                     <tr key={u.id} className="border-b border-gray-50 last:border-0 align-top">
                       <td className="px-4 py-3">
@@ -190,6 +249,29 @@ export default function AdminUsers() {
                         >
                           {u.is_active ? "Actif" : "Désactivé"}
                         </button>
+                      </td>
+                      <td className="px-4 py-3 min-w-[220px]">
+                        {showsOnRedaction ? (
+                          editingProfileId === u.id ? (
+                            <ProfileEditor
+                              target={u}
+                              onCancel={() => setEditingProfileId(null)}
+                              onSaved={(data) => {
+                                setUsers((list) => list.map((x) => (x.id === data.id ? { ...x, ...data } : x)));
+                                setEditingProfileId(null);
+                              }}
+                            />
+                          ) : (
+                            <button
+                              onClick={() => setEditingProfileId(u.id)}
+                              className="flex items-center gap-1.5 text-xs font-semibold text-itr-blue hover:text-itr-blue-dark"
+                            >
+                              <IdCard size={13} /> {u.bio || u.avatar ? "Modifier le profil" : "Renseigner le profil"}
+                            </button>
+                          )
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
                       </td>
                     </tr>
                   );

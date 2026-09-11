@@ -9,6 +9,8 @@ import ArticleDetail from "./pages/ArticleDetail";
 import WebTV from "./pages/WebTV";
 import Emissions from "./pages/Emissions";
 import Redaction from "./pages/Redaction";
+import RedacteurProfile from "./pages/RedacteurProfile";
+import Journalistes from "./pages/Journalistes";
 import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
@@ -30,6 +32,8 @@ export default function App() {
             <Route path="/webtv" element={<WebTV />} />
             <Route path="/emissions" element={<Emissions />} />
             <Route path="/redaction" element={<Redaction />} />
+            <Route path="/redaction/journalistes" element={<Journalistes />} />
+            <Route path="/redaction/:username" element={<RedacteurProfile />} />
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/connexion" element={<Auth />} />

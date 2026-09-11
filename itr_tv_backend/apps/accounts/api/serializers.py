@@ -15,12 +15,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 class AdminUserSerializer(serializers.ModelSerializer):
     """Gestion des utilisateurs par l'administrateur (qui fait aussi
-    office de rédacteur en chef)."""
+    office de rédacteur en chef). L'admin renseigne aussi la photo et la
+    bio affichées sur la page Rédaction (portfolio de l'équipe)."""
 
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name",
-                  "role", "is_active", "is_verified_journalist", "date_joined"]
+                  "role", "is_active", "is_verified_journalist", "date_joined",
+                  "avatar", "bio"]
         read_only_fields = ["username", "email", "first_name", "last_name", "date_joined"]
 
     def validate_role(self, value):
@@ -29,6 +31,19 @@ class AdminUserSerializer(serializers.ModelSerializer):
         if target and target.id == request.user.id:
             raise serializers.ValidationError("Vous ne pouvez pas modifier votre propre rôle.")
         return value
+
+
+class PublicTeamMemberSerializer(serializers.ModelSerializer):
+    """Champs publics affichés sur la page Rédaction (équipe éditoriale)."""
+
+    full_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "full_name", "role", "avatar", "bio"]
+
+    def get_full_name(self, obj):
+        return obj.get_full_name() or obj.username
 
 
 class CreateJournalistSerializer(serializers.ModelSerializer):
