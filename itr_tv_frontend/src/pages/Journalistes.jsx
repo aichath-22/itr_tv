@@ -25,8 +25,15 @@ export default function Journalistes() {
       </Link>
 
       <h1 className="font-display text-3xl text-itr-ink mb-3">Nos journalistes</h1>
+      <p className="text-gray-500 leading-relaxed mb-4">
+        Être journaliste chez ITR TV, c'est mettre l'information fiable, vérifiée et accessible au service du
+        public, en temps réel. Chaque membre de l'équipe collecte, recoupe et rédige les faits sur le terrain
+        avant leur diffusion, sous la supervision du rédacteur en chef.
+      </p>
       <p className="text-gray-500 leading-relaxed mb-10">
-        L'équipe qui produit l'actualité ITR TV au quotidien, sous la supervision du rédacteur en chef.
+        Rigueur dans la vérification des sources, curiosité, sens de l'écoute, réactivité face à l'actualité et
+        respect strict de la déontologie : ce sont les qualités que nos journalistes mettent en œuvre au
+        quotidien pour informer le Bénin, l'Afrique et le monde.
       </p>
 
       {loading && <p className="text-gray-400">Chargement...</p>}
