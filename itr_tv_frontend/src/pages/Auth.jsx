@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import logo from "../assets/logo-compact.jpeg";
+import logo from "../assets/logo-compact.png";
 
 const inputClass =
   "w-full rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none";
@@ -93,27 +93,27 @@ export default function Auth() {
             {mode === "register" && (
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Prénom" error={fieldErrors.first_name?.[0]}>
-                  <input name="first_name" value={form.first_name} onChange={handleChange} className={inputClass} />
+                  <input name="first_name" placeholder="Ex : Chidi" value={form.first_name} onChange={handleChange} className={inputClass} />
                 </Field>
                 <Field label="Nom" error={fieldErrors.last_name?.[0]}>
-                  <input name="last_name" value={form.last_name} onChange={handleChange} className={inputClass} />
+                  <input name="last_name" placeholder="Ex : Koffi" value={form.last_name} onChange={handleChange} className={inputClass} />
                 </Field>
               </div>
             )}
 
             <Field label="Nom d'utilisateur" error={fieldErrors.username?.[0]}>
-              <input name="username" required value={form.username} onChange={handleChange} className={inputClass} />
+              <input name="username" placeholder="Ex : chidi_k" required value={form.username} onChange={handleChange} className={inputClass} />
             </Field>
 
             {mode === "register" && (
               <Field label="Email" error={fieldErrors.email?.[0]}>
-                <input name="email" type="email" required value={form.email} onChange={handleChange} className={inputClass} />
+                <input name="email" type="email" placeholder="Ex : nom@exemple.com" required value={form.email} onChange={handleChange} className={inputClass} />
               </Field>
             )}
 
             <Field label="Mot de passe" error={fieldErrors.password?.[0]}>
               <input
-                name="password" type="password" required value={form.password} onChange={handleChange}
+                name="password" type="password" placeholder="8 caractères minimum" required value={form.password} onChange={handleChange}
                 className={inputClass}
               />
             </Field>
@@ -121,7 +121,7 @@ export default function Auth() {
             {mode === "register" && (
               <Field label="Confirmer le mot de passe" error={fieldErrors.confirm_password?.[0]}>
                 <input
-                  name="confirm_password" type="password" required value={form.confirm_password}
+                  name="confirm_password" type="password" placeholder="Ressaisissez le mot de passe" required value={form.confirm_password}
                   onChange={handleChange} className={inputClass}
                 />
               </Field>
@@ -166,7 +166,7 @@ export default function Auth() {
           style={{ clipPath: "polygon(32% 0, 100% 0, 100% 100%, 14% 100%)" }}
         />
         <div className="relative h-full flex flex-col justify-center px-14 py-16 text-white">
-          <img src={logo} alt="ITR TV" className="h-12 w-auto object-contain bg-white rounded-lg p-2 mb-10 self-start" />
+          <img src={logo} alt="ITR TV" className="h-12 w-auto object-contain mb-10 self-start" />
           <span className="font-condensed text-xs font-bold uppercase tracking-[0.2em] text-white/60 mb-3">
             InfosEnTempsRéel
           </span>

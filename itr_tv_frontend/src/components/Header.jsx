@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, Search, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import logo from "../assets/logo-full.jpeg";
+import logo from "../assets/logo-full.png";
 
 const NAV_LINKS = [
   { to: "/", label: "Accueil", end: true },
