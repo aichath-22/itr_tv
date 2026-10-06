@@ -1,22 +1,31 @@
 import { Link } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaYoutube, FaWhatsapp, FaLinkedinIn, FaTiktok, FaXTwitter } from "react-icons/fa6";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as api from "../api/endpoints";
-import logo from "../assets/logo-compact.jpeg";
+import logo from "../assets/logo-compact.png";
 
-const SOCIALS = [
-  { icon: FaFacebookF, href: "https://www.facebook.com/profile.php?id=100092600381179", label: "Facebook" },
-  { icon: FaInstagram, href: "https://www.instagram.com/itr_tv/", label: "Instagram" },
-  { icon: FaYoutube, href: "https://www.youtube.com/@InfosenTempsR%C3%A9elTV", label: "YouTube" },
-  { icon: FaWhatsapp, href: "https://whatsapp.com/channel/0029VaJlAKUDp2Q7oIN36632", label: "WhatsApp" },
-  { icon: FaLinkedinIn, href: "https://www.linkedin.com/feed/", label: "LinkedIn" },
-  { icon: FaTiktok, href: "https://www.tiktok.com/@infosentempsreel?lang=fr", label: "TikTok" },
-  { icon: FaXTwitter, href: "https://x.com/itr_tv", label: "X" },
+const SOCIAL_ICONS = [
+  { key: "facebook_url", icon: FaFacebookF, label: "Facebook" },
+  { key: "instagram_url", icon: FaInstagram, label: "Instagram" },
+  { key: "youtube_url", icon: FaYoutube, label: "YouTube" },
+  { key: "whatsapp_url", icon: FaWhatsapp, label: "WhatsApp" },
+  { key: "linkedin_url", icon: FaLinkedinIn, label: "LinkedIn" },
+  { key: "tiktok_url", icon: FaTiktok, label: "TikTok" },
+  { key: "x_url", icon: FaXTwitter, label: "X" },
 ];
 
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState(null);
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    api.getSiteSettings().then(({ data }) => setSettings(data)).catch(() => setSettings(null));
+  }, []);
+
+  const socials = settings
+    ? SOCIAL_ICONS.filter(({ key }) => settings[key]).map(({ key, ...rest }) => ({ ...rest, href: settings[key] }))
+    : [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,9 +43,10 @@ export default function Footer() {
     <footer className="bg-itr-blue-deep text-white mt-16">
       <div className="mx-auto max-w-7xl px-4 py-12 grid grid-cols-1 md:grid-cols-4 gap-10">
         <div>
-          <img src={logo} alt="ITR TV" className="h-14 w-auto object-contain bg-white rounded-lg p-1 mb-4" />
+          <img src={logo} alt="ITR TV" className="h-14 w-auto object-contain mb-4" />
           <p className="text-sm text-white/70 leading-relaxed">
-            Média numérique béninois dédié à l'information en continu : articles, direct, reportages et interviews.
+            {settings?.footer_description ||
+              "Média numérique béninois dédié à l'information en continu : articles, direct, reportages et interviews."}
           </p>
         </div>
 
@@ -82,7 +92,7 @@ export default function Footer() {
           {status === "error" && <p className="text-xs text-red-300 mt-2">Une erreur est survenue, réessayez.</p>}
 
           <div className="flex gap-3 mt-5">
-            {SOCIALS.map(({ icon: Icon, href, label }) => (
+            {socials.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
                 href={href}

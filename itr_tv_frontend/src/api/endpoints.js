@@ -90,3 +90,12 @@ export const getBreakingNews = () => apiClient.get("/notifications/breaking/");
 
 // --- Stats ---
 export const getDashboard = () => apiClient.get("/stats/dashboard/");
+
+// --- Paramètres du site & contact ---
+export const getSiteSettings = () => apiClient.get("/core/settings/");
+export const updateSiteSettings = (payload) => apiClient.patch("/core/settings/", payload);
+
+export const sendContactMessage = (payload) => apiClient.post("/core/contact/", payload);
+export const getContactMessages = () => apiClient.get("/core/contact/");
+export const markContactMessageRead = (id) => apiClient.patch(`/core/contact/${id}/`, { is_read: true });
+export const deleteContactMessage = (id) => apiClient.delete(`/core/contact/${id}/`);

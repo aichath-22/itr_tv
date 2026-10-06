@@ -19,6 +19,7 @@ import ArticleEditor from "./pages/ArticleEditor";
 import AdminUsers from "./pages/admin/Users";
 import AdminAds from "./pages/admin/Ads";
 import AdminWebTV from "./pages/admin/WebTV";
+import AdminSettings from "./pages/admin/Settings";
 
 export default function App() {
   return (
@@ -82,6 +83,14 @@ export default function App() {
               element={
                 <ProtectedRoute minRole="admin">
                   <AdminWebTV />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/parametres"
+              element={
+                <ProtectedRoute minRole="admin">
+                  <AdminSettings />
                 </ProtectedRoute>
               }
             />

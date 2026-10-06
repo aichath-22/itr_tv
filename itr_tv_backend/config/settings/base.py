@@ -120,6 +120,7 @@ REST_FRAMEWORK = {
         "user": "1000/hour",
         "auth": "10/hour",
         "newsletter": "5/hour",
+        "contact": "5/hour",
     },
 }
 
@@ -144,3 +145,15 @@ CORS_ALLOW_HEADERS = [
     "ngrok-skip-browser-warning",
     "bypass-tunnel-reminder",
 ]
+
+# --- Email (notification des messages de contact) ---
+# En dev par défaut : les emails s'affichent dans la console du serveur au lieu d'être
+# réellement envoyés. Pour un envoi réel en prod, renseigner EMAIL_HOST/USER/PASSWORD
+# (ex : un compte Gmail avec mot de passe d'application, ou un service comme Mailgun/SendGrid).
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@itrtv.bj")
