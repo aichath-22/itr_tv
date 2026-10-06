@@ -1,15 +1,16 @@
 services:
   db:
-    image: postgres:16-alpine
+    image: mysql:8.4
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-itr_tv}
-      POSTGRES_USER: ${DB_USER:-itr_tv_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_DATABASE: ${DB_NAME:-itr_tv}
+      MYSQL_USER: ${DB_USER:-itr_tv_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-change-me}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-change-me}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-itr_tv_user}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USER:-itr_tv_user}", "-p${DB_PASSWORD:-change-me}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -48,6 +49,6 @@ services:
       - web
 
 volumes:
-  postgres_data:
+  mysql_data:
   static_volume:
   media_volume:
