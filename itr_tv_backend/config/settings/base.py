@@ -157,3 +157,9 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@itrtv.bj")
+
+# --- Mot de passe oublié ---
+# URL du front-end utilisée pour construire le lien envoyé par email.
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+# Durée de validité du lien de réinitialisation (1h, au lieu des 3 jours par défaut de Django).
+PASSWORD_RESET_TIMEOUT = 3600

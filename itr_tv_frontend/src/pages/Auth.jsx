@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logo-compact.png";
 
@@ -136,6 +136,14 @@ export default function Auth() {
               {loading ? "Un instant..." : mode === "login" ? "Se connecter" : "Créer mon compte"}
             </button>
           </form>
+
+          {mode === "login" && (
+            <p className="text-sm text-center mt-4">
+              <Link to="/mot-de-passe-oublie" className="text-itr-blue font-semibold hover:text-itr-blue-dark">
+                Mot de passe oublié ?
+              </Link>
+            </p>
+          )}
 
           <p className="text-sm text-gray-500 text-center mt-6">
             {mode === "login" ? (

@@ -9,6 +9,12 @@ export const register = (payload) =>
 
 export const getMe = () => apiClient.get("/auth/me/");
 
+export const requestPasswordReset = (email) =>
+  apiClient.post("/auth/password-reset/", { email });
+
+export const confirmPasswordReset = (uid, token, new_password) =>
+  apiClient.post("/auth/password-reset-confirm/", { uid, token, new_password });
+
 export const getUsers = (search = "") =>
   apiClient.get("/auth/users/", { params: search ? { search } : {} });
 export const updateUser = (id, payload) => apiClient.patch(`/auth/users/${id}/`, payload);

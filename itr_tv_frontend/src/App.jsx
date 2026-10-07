@@ -14,12 +14,15 @@ import Journalistes from "./pages/Journalistes";
 import APropos from "./pages/APropos";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import ArticleEditor from "./pages/ArticleEditor";
 import AdminUsers from "./pages/admin/Users";
 import AdminAds from "./pages/admin/Ads";
 import AdminWebTV from "./pages/admin/WebTV";
 import AdminSettings from "./pages/admin/Settings";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -38,6 +41,8 @@ export default function App() {
             <Route path="/a-propos" element={<APropos />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/connexion" element={<Auth />} />
+            <Route path="/mot-de-passe-oublie" element={<ForgotPassword />} />
+            <Route path="/reinitialiser-mot-de-passe/:uid/:token" element={<ResetPassword />} />
             <Route
               path="/tableau-de-bord"
               element={
@@ -94,6 +99,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </AuthProvider>
