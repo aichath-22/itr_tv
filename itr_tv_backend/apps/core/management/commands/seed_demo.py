@@ -113,7 +113,8 @@ class Command(BaseCommand):
             u.role = role
             u.first_name, u.last_name = first_name, last_name
             u.bio = bio
-            u.avatar = self._image(f"portrait-{username}", 400, 400)
+            # avatar : champ d'upload réel désormais (cahier des charges §8) — pas de
+            # données de démo ici, le journaliste/admin uploade sa propre photo.
             u.is_active = True
             u.set_password(DEMO_PASSWORD)
             u.save()
@@ -143,7 +144,8 @@ class Command(BaseCommand):
                 slug=f"demo-article-{i + 1}",
                 excerpt=EXCERPT,
                 content=CONTENT,
-                cover_image=self._image(f"article-{i + 1}"),
+                # cover_image : champ d'upload réel désormais (cahier des charges §8) —
+                # pas de donnée de démo, le journaliste uploade sa propre image.
                 category=categories[cat_name],
                 author=author,
                 validated_by=validator,

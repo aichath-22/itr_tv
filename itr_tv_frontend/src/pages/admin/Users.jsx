@@ -85,7 +85,8 @@ function CreateJournalistForm({ onCreated }) {
 }
 
 function ProfileEditor({ target, onSaved, onCancel }) {
-  const [avatar, setAvatar] = useState(target.avatar || "");
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [currentAvatar, setCurrentAvatar] = useState(target.avatar || "");
   const [bio, setBio] = useState(target.bio || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -94,7 +95,10 @@ function ProfileEditor({ target, onSaved, onCancel }) {
     setSaving(true);
     setError("");
     try {
-      const { data } = await api.updateUser(target.id, { avatar, bio });
+      const fd = new FormData();
+      fd.append("bio", bio);
+      if (avatarFile) fd.append("avatar", avatarFile);
+      const { data } = await api.updateUser(target.id, fd);
       onSaved(data);
     } catch {
       setError("Impossible d'enregistrer le profil.");
@@ -106,12 +110,18 @@ function ProfileEditor({ target, onSaved, onCancel }) {
   return (
     <div className="mt-3 bg-itr-paper rounded-lg p-3 space-y-2">
       <div>
-        <label className="text-xs font-condensed font-bold uppercase text-gray-400">Photo (URL)</label>
+        <label className="text-xs font-condensed font-bold uppercase text-gray-400">Photo</label>
+        {(avatarFile || currentAvatar) && (
+          <img
+            src={avatarFile ? URL.createObjectURL(avatarFile) : currentAvatar}
+            alt="Aperçu"
+            className="h-16 w-16 rounded-full object-cover mt-1 mb-2 bg-gray-100"
+          />
+        )}
         <input
-          value={avatar}
-          onChange={(e) => setAvatar(e.target.value)}
-          placeholder="https://..."
-          className="w-full mt-1 rounded-lg px-3 py-2 border border-gray-200 text-sm focus:border-itr-blue focus:outline-none"
+          type="file" accept="image/*"
+          onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+          className="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-itr-blue/10 file:text-itr-blue file:px-3 file:py-1.5 file:text-xs file:font-semibold"
         />
       </div>
       <div>

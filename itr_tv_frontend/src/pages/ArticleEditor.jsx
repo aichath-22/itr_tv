@@ -41,9 +41,13 @@ export default function ArticleEditor() {
   const { user, hasRoleAtLeast } = useAuth();
 
   const [form, setForm] = useState({
-    title: "", excerpt: "", content: "", cover_image: "", attached_pdf: "",
+    title: "", excerpt: "", content: "",
     category: "", tags: [],
   });
+  const [currentCoverImage, setCurrentCoverImage] = useState("");
+  const [currentAttachedPdf, setCurrentAttachedPdf] = useState("");
+  const [coverFile, setCoverFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
   const [article, setArticle] = useState(null);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -74,11 +78,11 @@ export default function ArticleEditor() {
           title: data.title,
           excerpt: data.excerpt || "",
           content: data.content,
-          cover_image: data.cover_image || "",
-          attached_pdf: data.attached_pdf || "",
           category: data.category?.id || "",
           tags: (data.tags || []).map((t) => t.id),
         });
+        setCurrentCoverImage(data.cover_image || "");
+        setCurrentAttachedPdf(data.attached_pdf || "");
         return api.getArticleReviews(data.id);
       })
       .then(({ data }) => setReviews(data.results || data))
@@ -111,10 +115,17 @@ export default function ArticleEditor() {
     }
   };
 
-  const buildPayload = () => ({
-    ...form,
-    category: form.category ? Number(form.category) : null,
-  });
+  const buildFormData = () => {
+    const fd = new FormData();
+    fd.append("title", form.title);
+    fd.append("excerpt", form.excerpt);
+    fd.append("content", form.content);
+    if (form.category) fd.append("category", form.category);
+    form.tags.forEach((id) => fd.append("tags", id));
+    if (coverFile) fd.append("cover_image", coverFile);
+    if (pdfFile) fd.append("attached_pdf", pdfFile);
+    return fd;
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -124,15 +135,19 @@ export default function ArticleEditor() {
     setSuccessMessage("");
     try {
       if (isEditing) {
-        const { data } = await api.updateArticle(slug, buildPayload());
+        const { data } = await api.updateArticle(slug, buildFormData());
         setArticle(data);
+        setCurrentCoverImage(data.cover_image || "");
+        setCurrentAttachedPdf(data.attached_pdf || "");
+        setCoverFile(null);
+        setPdfFile(null);
         setSuccessMessage(
           data.status === "pending" && article?.status === "published"
             ? "Modifications enregistrées — l'article repasse en attente de validation avant remise en ligne."
             : "Modifications enregistrées."
         );
       } else {
-        const { data } = await api.createArticle(buildPayload());
+        const { data } = await api.createArticle(buildFormData());
         navigate(`/tableau-de-bord/articles/${data.slug}/modifier`, { replace: true });
         return;
       }
@@ -230,11 +245,35 @@ export default function ArticleEditor() {
         </Field>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Image de couverture (URL)" error={fieldErrors.cover_image?.[0]}>
-            <input name="cover_image" type="url" value={form.cover_image} onChange={handleChange} className={inputClass} disabled={!canEdit} />
+          <Field label="Image de couverture" error={fieldErrors.cover_image?.[0]}>
+            {(coverFile || currentCoverImage) && (
+              <img
+                src={coverFile ? URL.createObjectURL(coverFile) : currentCoverImage}
+                alt="Aperçu de la couverture"
+                className="h-28 w-full object-cover rounded-lg mb-2 bg-gray-100"
+              />
+            )}
+            <input
+              type="file" accept="image/*" disabled={!canEdit}
+              onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+              className="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-itr-blue/10 file:text-itr-blue file:px-3 file:py-1.5 file:text-xs file:font-semibold"
+            />
           </Field>
-          <Field label="PDF joint (URL)" error={fieldErrors.attached_pdf?.[0]}>
-            <input name="attached_pdf" type="url" value={form.attached_pdf} onChange={handleChange} className={inputClass} disabled={!canEdit} />
+          <Field label="PDF joint" error={fieldErrors.attached_pdf?.[0]}>
+            {(pdfFile || currentAttachedPdf) && (
+              <p className="text-xs text-gray-500 mb-2 truncate">
+                📄 {pdfFile ? pdfFile.name : (
+                  <a href={currentAttachedPdf} target="_blank" rel="noreferrer" className="text-itr-blue hover:underline">
+                    Voir le PDF actuel
+                  </a>
+                )}
+              </p>
+            )}
+            <input
+              type="file" accept="application/pdf" disabled={!canEdit}
+              onChange={(e) => setPdfFile(e.target.files?.[0] || null)}
+              className="w-full text-sm text-gray-500 file:mr-3 file:rounded-full file:border-0 file:bg-itr-blue/10 file:text-itr-blue file:px-3 file:py-1.5 file:text-xs file:font-semibold"
+            />
           </Field>
         </div>
 

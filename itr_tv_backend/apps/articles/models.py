@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.files.storage import storages
 from django.db import models
 from apps.core.models import TimeStampedModel
 
@@ -34,8 +35,8 @@ class Article(TimeStampedModel):
     slug = models.SlugField(unique=True)
     excerpt = models.CharField(max_length=500, blank=True)
     content = models.TextField()
-    cover_image = models.URLField(blank=True)
-    attached_pdf = models.URLField(blank=True)
+    cover_image = models.ImageField(upload_to="articles/covers/", blank=True)
+    attached_pdf = models.FileField(upload_to="articles/pdfs/", blank=True, storage=storages["raw"])
 
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="articles")
     tags = models.ManyToManyField(Tag, blank=True, related_name="articles")

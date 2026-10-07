@@ -6,3 +6,4 @@ django-filter>=24.2
 mysqlclient>=2.2
 Pillow>=10.4
 python-dotenv>=1.0
+django-cloudinary-storage>=0.3

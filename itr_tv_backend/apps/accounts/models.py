@@ -10,7 +10,7 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.ABONNE)
     phone = models.CharField(max_length=20, blank=True)
-    avatar = models.URLField(blank=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True)
     bio = models.TextField(blank=True)
     is_verified_journalist = models.BooleanField(default=False)
 

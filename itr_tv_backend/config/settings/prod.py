@@ -30,13 +30,3 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
-
-# --- Stockage médias sur Cloudinary (recommandé par le cahier des charges) ---
-# pip install django-cloudinary-storage puis décommenter :
-# INSTALLED_APPS += ["cloudinary_storage", "cloudinary"]
-# DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-# CLOUDINARY_STORAGE = {
-#     "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
-#     "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
-#     "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
-# }
