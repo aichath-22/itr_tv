@@ -22,7 +22,7 @@ python manage.py runserver
 - API : http://127.0.0.1:8000/api/v1/
 - Admin : http://127.0.0.1:8000/admin/
 
-Par défaut, le projet tourne en `config.settings.dev` avec **SQLite** (aucune base à installer pour démarrer). Pour utiliser PostgreSQL en local, décommente la config dans `config/settings/dev.py`.
+Par défaut, le projet tourne en `config.settings.dev` avec **SQLite** (aucune base à installer pour démarrer). Pour utiliser MySQL en local (comme en production), décommente la config dans `config/settings/dev.py`.
 
 ## Endpoints principaux
 
