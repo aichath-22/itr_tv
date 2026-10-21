@@ -22,6 +22,11 @@ class UserSerializer(serializers.ModelSerializer):
                   "role", "phone", "avatar", "bio", "is_verified_journalist"]
         read_only_fields = ["role", "is_verified_journalist"]
 
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exclude(pk=self.instance.pk).exists():
+            raise serializers.ValidationError("Un compte existe déjà avec cet email.")
+        return value
+
 
 class AdminUserSerializer(serializers.ModelSerializer):
     """Gestion des utilisateurs par l'administrateur (qui fait aussi

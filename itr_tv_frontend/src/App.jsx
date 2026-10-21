@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import ArticleEditor from "./pages/ArticleEditor";
 import AdminUsers from "./pages/admin/Users";
 import AdminAds from "./pages/admin/Ads";
@@ -48,6 +49,14 @@ export default function App() {
               element={
                 <ProtectedRoute minRole="journaliste">
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tableau-de-bord/profil"
+              element={
+                <ProtectedRoute minRole="journaliste">
+                  <Profile />
                 </ProtectedRoute>
               }
             />

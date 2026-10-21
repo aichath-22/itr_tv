@@ -8,6 +8,7 @@ export const register = (payload) =>
   apiClient.post("/auth/register/", payload);
 
 export const getMe = () => apiClient.get("/auth/me/");
+export const updateMe = (payload) => apiClient.patch("/auth/me/", payload);
 
 export const requestPasswordReset = (email) =>
   apiClient.post("/auth/password-reset/", { email });
